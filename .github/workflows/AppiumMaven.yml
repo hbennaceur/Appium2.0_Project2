@@ -59,15 +59,17 @@ jobs:
       - name: Check for port conflicts
         run: lsof -ti:5554 && echo "Port 5554 is in use" || echo "Port 5554 is available"
 
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "build-tools;34.0.0" "platform-tools" "emulator" "system-images;android-34;default;x86"
+
       - name: Launch Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           force-avd-creation: false
           disable-animations: true
-          script: |
-            emulator @Pixel_5 -no-snapshot -no-boot-anim -no-window -no-audio -accel auto -gpu swiftshader_indirect
-            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
 
       - name: Run Appium Android tests
         run: mvn clean test -Pandroid
