@@ -65,6 +65,9 @@ jobs:
           api-level: ${{ matrix.api-level }}
           force-avd-creation: false
           disable-animations: true
+          script: |
+            emulator @Pixel_5 -no-snapshot -no-boot-anim -no-window -no-audio -accel auto -gpu swiftshader_indirect
+            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
 
       - name: Run Appium Android tests
         run: mvn clean test -Pandroid
