@@ -3,13 +3,9 @@ name: Java Selenium Appium Tests
 on: [push, pull_request]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-
       - name: Check out repository
         uses: actions/checkout@v2
 
@@ -24,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: mvn -B dependency:resolve dependency:resolve-plugins
 
-      - name: Install and configure Android emulator
+      - name: Install Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -33,11 +29,18 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-audio -no-window
           disable-animations: true
-          script: echo "Emulator is ready."
+          target: default
+          cores: 2
+          avd-name: test
+          emulator-boot-timeout: 600
+          disable-spellchecker: false
+          disable-linux-hw-accel: auto
+          enable-hw-keyboard: false
+          channel: stable
 
       - name: Start Android Emulator
         run: |
-          emulator -avd sdk_gphone64_x86_64 -no-audio -no-window &
+          emulator -avd test -no-audio -no-window &
           android-wait-for-emulator
 
       - name: Run tests
