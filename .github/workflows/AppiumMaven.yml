@@ -72,9 +72,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2.27.0
         with:
           api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
           profile: Pixel_5
+          target: google_apis
 
 
       - name: Run Appium Android tests
