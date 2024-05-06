@@ -6,7 +6,7 @@ set -ex
 # En supposant que le SDK Android est déjà installé et configuré sur votre système
 
 # Installer Appium et les pilotes Android
-npm install -g appium@next
+npm install -g appium@2.5.1
 appium driver install uiautomator2
 appium driver install espresso
 appium driver install flutter
