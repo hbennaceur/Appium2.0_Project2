@@ -1,82 +1,34 @@
-name: Run Android tests with Appium on Emulator
+name: Appium CI
 
 on:
   push:
-    branches:
-      - '**'
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
+  ui-tests:
     strategy:
       matrix:
         api-level: [34]
-
+        target: [default]
+    runs-on: macos-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3.6.0
         with:
+          distribution: 'temurin'
           java-version: 17
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16.13.0'
-
-      - name: Install Appium
-        run: |
-          npm install -g appium@2.5.1
-          appium -v
-          appium &>/dev/null &
-
-      - name: Cache AVD
-        uses: actions/cache@v2
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
-
-      - name: Clone project repository
-        uses: actions/checkout@v2
-        with:
-          repository: BedouiKhaledEQA/Appium2.0_Project2
-          path: Appium2.0_Project2
-
-      - name: Change to project directory
-        run: cd Appium2.0_Project2
-
-      - name: Display current directory contents
-        run: |
-          ls -l
-          echo "Current directory: $PWD"
-
-      - name: Check for port conflicts
-        run: lsof -ti:5554 && echo "Port 5554 is in use" || echo "Port 5554 is available"
-
-
+          cache: 'maven'
 
       - name: Install the Emulator
         run: |
-         chmod +x ./scripts/RunAppiumServer.sh
-         ./scripts/RunAppiumServer.sh
+          chmod +x ./scripts/RunAppiumServer.sh
+          ./scripts/RunAppiumServer.sh
         shell: bash
-        
 
-      - name: Launch Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2.27.0
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
-          profile: Pixel_5
-
-
-      - name: Run Appium Android tests
-        run: mvn clean test -Pandroid
-
+      - name: Build and Test with Maven
+        run: mvn clean test
