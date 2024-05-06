@@ -74,6 +74,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           profile: Pixel_5
           target: google_apis
+          script: ./scripts/run_on_emulator.sh
 
 
       - name: Run Appium Android tests
