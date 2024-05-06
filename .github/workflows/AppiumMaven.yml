@@ -64,15 +64,21 @@ jobs:
           yes | sdkmanager --licenses
           sdkmanager "build-tools;34.0.0" "platform-tools" "emulator" "system-images;android-34;default;x86"
 
+      - name: Install the Emulator
+        run: |
+         chmod +x ./scripts/RunAppiumServer.sh
+         ./scripts/RunAppiumServer.sh
+        shell: bash
+        
+
       - name: Launch Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.27.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
           arch: x86_64
           profile: Pixel_5
-          force-avd-creation: false
-          disable-animations: true
+
 
       - name: Run Appium Android tests
         run: mvn clean test -Pandroid
