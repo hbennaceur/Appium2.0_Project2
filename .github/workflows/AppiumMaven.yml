@@ -54,5 +54,5 @@ jobs:
       - name: Run Selenium Appium tests
         run: mvn -Dtest=TestRunner test
 
-      - name: Terminate Emulator
+      - name: Terminate Emulators
         run: adb emu kill
