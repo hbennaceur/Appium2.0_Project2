@@ -1,46 +1,66 @@
-name: Run Android tests with Appium on Emulator
+name: Pre-Commit E2E Tests in Android
 
 on:
   push:
-    branches:
-      - '**'
+    branches: [ master ] # Remplacez "master" par le nom de votre branche principale
+  pull_request:
+    branches: [ develop ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        api-level: [34]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: master # Remplacez "master" par le nom de votre branche principale
+
+      - name: Set up Node.js 16.13.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.13.0'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: 17
+          java-version: '17'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16.13.0'
+      - name: Install Appium
+        run: npm install -g appium@2.5.1
 
-      - name: Install Appium and configure Android SDK
+      - name: Clean Packages
         run: |
-          chmod +x ./scripts/RunAppiumServer.sh
-          ./scripts/RunAppiumServer.sh
-          sudo chown $USER:$USER /usr/local/lib/android/sdk -R
-          yes | sdkmanager --licenses > /dev/null
-          sdkmanager --install 'build-tools;33.0.0' platform-tools 'platforms;android-34' emulator 'system-images;android-34;google_apis;x86' > /dev/null
+          rm -rf node_modules
+          npm cache clean --force
+          rm -rf package-lock.json
 
-      - name: Launch Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2.27.0
+      - name: Start the Appium Server
+        run: appium --log-timestamp --log-no-colors --allow-insecure chromedriver_autodownload > appium.log &
+
+      - name: Poll for Appium Server to Start
+        run: |
+          until $(curl --output /dev/null --silent --head --fail http://127.0.0.1:4723/wd/hub/sessions); do
+            sleep 5
+          done
+
+      - name: Set up Maven
+        uses: actions/setup-java@v2
         with:
-          api-level: ${{ matrix.api-level }}
-          profile: Pixel_5
-          target: google_apis
+          distribution: 'adopt'
+          java-version: '17'
+          maven-version: '3.8.4'
 
-      - name: Run Appium Android tests
-        run: ./scripts/run_on_emulator.sh
+      - name: Build and Test with Maven
+        run: mvn clean install
+
+      # Ajoutez ici les étapes pour exécuter vos tests Appium/Selenium Java
+      # Assurez-vous d'installer toutes les dépendances nécessaires et de configurer correctement votre environnement de test.
+
+      - name: Upload Appium logs
+        uses: actions/upload-artifact@v1
+        with:
+          name: appium.log
+          path: appium.log
+
+      # Ajoutez ici les étapes pour télécharger et visualiser les résultats des tests si nécessaire
