@@ -37,6 +37,8 @@ jobs:
           disable-linux-hw-accel: auto
           enable-hw-keyboard: false
           channel: stable
+        env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64
 
       - name: Start Android Emulator
         run: |
@@ -51,3 +53,6 @@ jobs:
 
       - name: Run Selenium Appium tests
         run: mvn -Dtest=TestRunner test
+
+      - name: Terminate Emulator
+        run: adb emu kill
