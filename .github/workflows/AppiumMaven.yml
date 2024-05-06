@@ -35,9 +35,9 @@ jobs:
       - name: Install and configure Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-            api-level: 29
+            api-level: 34
             arch: x86
-            profile: Nexus_5X_API_29
+            profile: Pixel_5
             force-avd-creation: false
             emulator-options: -no-audio -no-window
             disable-animations: true
