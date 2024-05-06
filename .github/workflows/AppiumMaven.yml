@@ -59,10 +59,7 @@ jobs:
       - name: Check for port conflicts
         run: lsof -ti:5554 && echo "Port 5554 is in use" || echo "Port 5554 is available"
 
-      - name: Install Android SDK components
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager "build-tools;34.0.0" "platform-tools" "emulator" "system-images;android-34;default;x86"
+
 
       - name: Install the Emulator
         run: |
