@@ -3,13 +3,9 @@ name: Java Selenium Appium Tests
 on: [push, pull_request]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-
       - name: Check out repository
         uses: actions/checkout@v2
 
@@ -31,28 +27,25 @@ jobs:
 
       - name: Install dependencies
         run: mvn -B dependency:resolve dependency:resolve-plugins
-          # Install and configure Android emulator
+
       - name: Install and configure Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-            api-level: 34
-            arch: x86
-            profile: Pixel_5
-            force-avd-creation: false
-            emulator-options: -no-audio -no-window
-            disable-animations: true
-            script: echo "Emulator is ready.
-
+          api-level: 30 # Remplacer par la version de votre choix
+          arch: x86
+          profile: Pixel_5 # Remplacer par le profil de votre choix
+          force-avd-creation: false
+          emulator-options: -no-audio -no-window
+          disable-animations: true
+          script: echo "Emulator is ready."
 
       - name: Start Android Emulator
         run: |
-           emulator -avd Pixel_5 -no-audio -no-window &
-           android-wait-for-emulator
+          emulator -avd Pixel_5 -no-audio -no-window &
+          android-wait-for-emulator
 
       - name: Run tests
         run: mvn test
-
-      # Add additional steps to start Appium server if necessary
 
       - name: Start Appium Server
         run: appium &
