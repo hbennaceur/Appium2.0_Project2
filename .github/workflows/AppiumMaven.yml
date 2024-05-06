@@ -1,59 +1,49 @@
-name: Run android tests in github runner
+name: Java Selenium Appium Tests
 
-on:
-  push:
-    branches: [ master ]
-
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
-  test:
+
+  build:
+
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        api-level: [34]
+
     steps:
-      - name: checkout
+
+      - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: Set up JDK 17
+      - name: Set up JDK 17 and Android SDK
         uses: actions/setup-java@v2
         with:
-          java-version: 17
+          java-version: '17'
           distribution: 'adopt'
+        env:
+          ANDROID_HOME: ${{ runner.workspace }}/android-sdk-linux
 
-      - uses: actions/setup-node@v2
+      - name: Cache Maven packages
+        uses: actions/cache@v3
         with:
-          node-version: '16.3.0'
-      - run: |
-          npm install -g appium@v2.5.1
-          appium -v
-          appium &>/dev/null &
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2
 
-      - name: AVD cache
-        uses: actions/cache@v2
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
+      - name: Install dependencies
+        run: mvn -B dependency:resolve dependency:resolve-plugins
 
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
+      - name: Start Android Emulator
+        run: |
+           emulator -avd Pixel_5 -no-audio -no-window &
+           android-wait-for-emulator
 
-      - name: run android tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: mvn -Dtest=TestRunner test
+      - name: Run tests
+        run: mvn test
+
+      # Add additional steps to start Appium server if necessary
+
+      - name: Start Appium Server
+        run: appium &
+
+      - name: Run Selenium Appium tests
+        run: mvn -Dtest=TestRunner test
