@@ -3,9 +3,13 @@ name: Java Selenium Appium Tests
 on: [push, pull_request]
 
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
+
     steps:
+
       - name: Check out repository
         uses: actions/checkout@v2
 
@@ -17,23 +21,15 @@ jobs:
         env:
           ANDROID_HOME: ${{ runner.workspace }}/android-sdk-linux
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-m2
-
       - name: Install dependencies
         run: mvn -B dependency:resolve dependency:resolve-plugins
 
       - name: Install and configure Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30 # Remplacer par la version de votre choix
+          api-level: 14
           arch: x86
-          profile: Pixel_5 # Remplacer par le profil de votre choix
+          profile: Pixel_5
           force-avd-creation: false
           emulator-options: -no-audio -no-window
           disable-animations: true
