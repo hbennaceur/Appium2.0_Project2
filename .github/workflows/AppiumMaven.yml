@@ -31,6 +31,15 @@ jobs:
 
       - name: Install dependencies
         run: mvn -B dependency:resolve dependency:resolve-plugins
+          # Install and configure Android emulator
+      - name: Install and configure Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+        api-level: 34 # Specify the Android API level
+        tag: google_apis # Specify the system image tag
+        arch: x86 # Specify the architecture
+        profile: Pixel_5 # Specify the emulator profile
+
 
       - name: Start Android Emulator
         run: |
