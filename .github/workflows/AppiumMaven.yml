@@ -28,7 +28,11 @@ jobs:
             ${{ runner.os }}-m2
 
       - name: Install dependencies
-        run: mvn -B dependency:resolve dependency:resolve-plugins
+        run: mvn -B dependency:resolve dependency:resolve-
+      - name: Start Android Emulator
+        run: |
+           emulator -avd your_emulator_name -no-audio -no-window &
+           android-wait-for-emulator
 
       - name: Run tests
         run: mvn test
