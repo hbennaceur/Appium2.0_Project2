@@ -9,7 +9,6 @@ set -ex
 npm install -g appium@2.5.1
 appium driver install uiautomator2
 appium driver install espresso
-appium driver install flutter
 
 # Vérifier la version d'Appium installée
 appium -v
