@@ -27,46 +27,13 @@ jobs:
         with:
           node-version: '16.13.0'
 
-      - name: Install Appium
+      - name: Install Appium and configure Android SDK
         run: |
-          npm install -g appium@2.5.1
-          appium -v
-          appium &>/dev/null &
-
-      - name: Cache AVD
-        uses: actions/cache@v2
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
-
-      - name: Clone project repository
-        uses: actions/checkout@v2
-        with:
-          repository: BedouiKhaledEQA/Appium2.0_Project2
-          path: Appium2.0_Project2
-
-      - name: Change to project directory
-        run: cd Appium2.0_Project2
-
-      - name: Display current directory contents
-        run: |
-          ls -l
-          echo "Current directory: $PWD"
-
-      - name: Check for port conflicts
-        run: lsof -ti:5554 && echo "Port 5554 is in use" || echo "Port 5554 is available"
-
-
-
-      - name: Install the Emulator
-        run: |
-         chmod +x ./scripts/RunAppiumServer.sh
-         ./scripts/RunAppiumServer.sh
-        shell: bash
-
+          chmod +x ./scripts/RunAppiumServer.sh
+          ./scripts/RunAppiumServer.sh
+          sudo chown $USER:$USER /usr/local/lib/android/sdk -R
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager --install 'build-tools;33.0.0' platform-tools 'platforms;android-34' emulator 'system-images;android-34;google_apis;x86' > /dev/null
 
       - name: Launch Android Emulator
         uses: reactivecircus/android-emulator-runner@v2.27.0
@@ -74,9 +41,6 @@ jobs:
           api-level: ${{ matrix.api-level }}
           profile: Pixel_5
           target: google_apis
-          script: ./scripts/run_on_emulator.sh
-
 
       - name: Run Appium Android tests
-        run: mvn clean test -Pandroid
-
+        run: ./scripts/run_on_emulator.sh
