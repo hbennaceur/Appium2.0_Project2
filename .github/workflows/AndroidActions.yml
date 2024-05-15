@@ -1,15 +1,18 @@
 name: Appium CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
         api-level: [34]
-        target: [google_apis]
+        target: [default]
 
     steps:
       - uses: actions/checkout@v2
@@ -34,13 +37,9 @@ jobs:
       - name: Create and Start Emulator
         run: |
           echo "y" | sdkmanager --install "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64"
-          avdmanager create avd -n Pixel_5 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" --device "pixel"
-          emulator -avd Pixel_5 -no-window -no-audio &
-
-      - name: Wait for Emulator to Boot
-        run: |
-          adb wait-for-device shell "while [[ -z \$(getprop sys.boot_completed) ]]; do sleep 1; done;"
-          adb shell input keyevent 82
+          avdmanager create avd -n test -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" --device "pixel"
+          emulator -avd test -no-audio -no-window &
+          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
 
       - name: Install Node.js
         uses: actions/setup-node@v2
@@ -61,8 +60,12 @@ jobs:
           done;
           echo "Appium server is running";
 
-      - name: Run Appium Tests with Maven
-        run: mvn test -Dtest=runner.TestRunner
+      - name: Run Appium Tests
+        run: |
+          # Insert your command to run tests here
+          # Example: mvn test -Dtest=runner.TestRunner
+          echo "Running tests with Maven"
+          mvn test -Dtest=runner.TestRunner
 
       - name: Terminate Emulator
-        run: adb -s emulator-5554 emu kill
+        run: adb emu kill
