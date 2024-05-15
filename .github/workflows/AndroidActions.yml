@@ -1,4 +1,4 @@
-name: Appium CI
+name: Android Emulator Test
 
 on:
   push:
@@ -8,11 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        api-level: [34]
-        target: [default]
 
     steps:
       - uses: actions/checkout@v2
@@ -30,42 +25,26 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
+          sdk-version: '34'
 
-      - name: Create and Start Emulator
+      - name: Install emulator
         run: |
-          echo "y" | sdkmanager --install "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64"
-          avdmanager create avd -n test -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" --device "pixel"
-          emulator -avd test -no-audio -no-window &
-          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
+          echo "y" | sdkmanager --install "emulator"
+          echo "y" | sdkmanager --install "platforms;android-34"
+          echo "y" | sdkmanager --install "system-images;android-34;default;x86_64"
 
-      - name: Install Node.js
-        uses: actions/setup-node@v2
+      - name: Create and start emulator
+        uses: reactivecircus/android-emulator-runner@v2
         with:
-          node-version: '16.13.0'
+          api-level: 34
+          arch: x86_64
+          profile: default
+          avd-name: Pixel_5
+          emulator-options: -no-audio -no-window
 
-      - name: Install Appium
-        run: npm install -g appium
+      - name: Wait for emulator to start
+        run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
 
-      - name: Start Appium Server
-        run: appium &
+      - name: Run Maven Tests
+        run: mvn test
 
-      - name: Wait for Appium Server to Start
-        run: |
-          while ! nc -z localhost 4723; do   
-            echo "Waiting for Appium server...";
-            sleep 1;
-          done;
-          echo "Appium server is running";
-
-      - name: Run Appium Tests
-        run: |
-          # Insert your command to run tests here
-          # Example: mvn test -Dtest=runner.TestRunner
-          echo "Running tests with Maven"
-          mvn test -Dtest=runner.TestRunner
-
-      - name: Terminate Emulator
-        run: adb emu kill
