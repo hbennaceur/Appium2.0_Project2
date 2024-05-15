@@ -2,7 +2,7 @@ name: Run android tests in GitHub Runner
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
