@@ -38,7 +38,9 @@ jobs:
           emulator -avd Pixel_5 -no-window -no-audio &
 
       - name: Wait for Emulator to Boot
-        run: adb wait-for-device shell "while [[ -z \$(getprop sys.boot_completed) ]]; do sleep 1; done;"
+        run: |
+          adb wait-for-device shell "while [[ -z \$(getprop sys.boot_completed) ]]; do sleep 1; done;"
+          adb shell input keyevent 82
 
       - name: Install Node.js
         uses: actions/setup-node@v2
@@ -50,6 +52,14 @@ jobs:
 
       - name: Start Appium Server
         run: appium &
+
+      - name: Wait for Appium Server to Start
+        run: |
+          while ! nc -z localhost 4723; do   
+            echo "Waiting for Appium server...";
+            sleep 1;
+          done;
+          echo "Appium server is running";
 
       - name: Run Appium Tests with Maven
         run: mvn test -P test-runner
