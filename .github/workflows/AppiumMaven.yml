@@ -44,8 +44,7 @@ jobs:
       - name: Add Android SDK to PATH
         run: |
           echo "ANDROID_HOME=${{ runner.tool_cache }}/android-sdk" >> $GITHUB_ENV
-          echo "PATH=\$PATH:\$ANDROID_HOME/platform-tools" >> $GITHUB_ENV
-        shell: bash
+          echo "${{ runner.tool_cache }}/android-sdk/platform-tools" >> $GITHUB_PATH
 
       - name: Verify ADB
         run: adb version
@@ -81,3 +80,4 @@ jobs:
 
     env:
       JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64
+      ANDROID_HOME: ${{ runner.tool_cache }}/android-sdk
