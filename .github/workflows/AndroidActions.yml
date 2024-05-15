@@ -1,14 +1,13 @@
-name: Run android tests in github runner
+name: Run android tests in GitHub Runner
 
 on:
   push:
-    branches: [ main ]
-
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         api-level: [34]
@@ -21,13 +20,26 @@ jobs:
         with:
           java-version: 17
 
-      - uses: actions/setup-node@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: '16.13.0'
+
       - run: |
           npm install -g appium@v2.5.1
           appium -v
           appium &>/dev/null &
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          sdk-version: '34'
+
+      - name: Add Android SDK to PATH
+        run: echo "::add-path::${ANDROID_HOME}/platform-tools"
+
+      - name: Verify ADB
+        run: adb version
 
       - name: AVD cache
         uses: actions/cache@v2
@@ -38,7 +50,7 @@ jobs:
             ~/.android/adb*
           key: avd-${{ matrix.api-level }}
 
-      - name: create AVD and generate snapshot for caching
+      - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -48,7 +60,7 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: run android tests
+      - name: Run android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -56,3 +68,7 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: mvn clean test -Pandroid
+
+    env:
+      JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64
+      ANDROID_HOME: ${{ runner.tool_cache }}/android-sdk
