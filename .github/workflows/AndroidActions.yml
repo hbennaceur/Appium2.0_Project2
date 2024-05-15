@@ -63,6 +63,9 @@ jobs:
             export PATH=$PATH:/Users/KhaledBEDOUI/AppData/Local/Android/Sdk/platform-tools
             mvn clean test -Pandroid
 
+      - name: Set up ADB path
+        run: echo "/Users/KhaledBEDOUI/AppData/Local/Android/Sdk/platform-tools" >> $GITHUB_PATH
+
     env:
       JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64
       ANDROID_HOME: /Users/KhaledBEDOUI/Library/Android/sdk
