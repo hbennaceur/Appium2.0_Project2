@@ -1,11 +1,3 @@
-name: Run android tests in github runner
-
-on:
-  push:
-    branches: [ main ]
-
-  workflow_dispatch:
-
 jobs:
   test:
     runs-on: macos-latest
@@ -28,6 +20,11 @@ jobs:
           npm install -g appium@v2.5.1
           appium -v
           appium &>/dev/null &
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          sdk-version: '31'  # Modifier en fonction de la version de votre SDK
 
       - name: AVD cache
         uses: actions/cache@v2
@@ -55,4 +52,10 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: mvn clean test -Pandroid
+          script: |
+            export PATH=$PATH:/Users/KhaledBEDOUI/AppData/Local/Android/Sdk/platform-tools  # Remplacez ce chemin par le vôtre
+            mvn clean test -Pandroid
+
+env:
+  JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64
+  ANDROID_HOME: /Users/KhaledBEDOUI/Library/Android/sdk
