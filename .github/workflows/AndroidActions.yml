@@ -62,4 +62,7 @@ jobs:
           echo "Appium server is running";
 
       - name: Run Appium Tests with Maven
-        run: mvn test -P test-runner
+        run: mvn test -Dtest=runner.TestRunner
+
+      - name: Terminate Emulator
+        run: adb -s emulator-5554 emu kill
