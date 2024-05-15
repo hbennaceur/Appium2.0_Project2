@@ -1,3 +1,10 @@
+name: Run android tests in GitHub Runner
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
 jobs:
   test:
     runs-on: macos-latest
@@ -24,7 +31,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
-          sdk-version: '31'  # Modifier en fonction de la version de votre SDK
+          sdk-version: '31'
 
       - name: AVD cache
         uses: actions/cache@v2
@@ -53,9 +60,9 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
-            export PATH=$PATH:/Users/KhaledBEDOUI/AppData/Local/Android/Sdk/platform-tools  # Remplacez ce chemin par le vôtre
+            export PATH=$PATH:/Users/KhaledBEDOUI/AppData/Local/Android/Sdk/platform-tools
             mvn clean test -Pandroid
 
-env:
-  JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64
-  ANDROID_HOME: /Users/KhaledBEDOUI/Library/Android/sdk
+    env:
+      JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64
+      ANDROID_HOME: /Users/KhaledBEDOUI/Library/Android/sdk
