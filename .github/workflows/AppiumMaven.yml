@@ -41,17 +41,21 @@ jobs:
           sdkmanager --install 'system-images;android-34;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
-          yes | sdkmanager --licenses
+
+      - name: Accept SDK licenses
+        run: |
+          echo y | sdkmanager --licenses
 
       - name: Create AVD
         run: |
-          echo "no" | avdmanager create avd -n test -k "system-images;android-34;google_apis;x86_64" --force
+          echo no | avdmanager create avd -n test -k "system-images;android-34;google_apis;x86_64" --force
 
       - name: Start emulator
         run: |
           emulator -avd test -no-window -no-audio -no-boot-anim &
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
+
 
       - name: Add Maven to PATH
         run: |
