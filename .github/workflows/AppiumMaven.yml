@@ -27,7 +27,6 @@ jobs:
         run: |
           npm install -g appium@v2.5.1
           appium -v
-          appium &>/dev/null &
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
@@ -45,7 +44,7 @@ jobs:
 
       - name: Accept SDK licenses
         run: |
-          yes | sdkmanager --licenses
+          echo y | sdkmanager --licenses
 
       - name: Create AVD
         run: |
@@ -57,21 +56,14 @@ jobs:
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
-      - name: Wait for emulator to boot
-        run: |
-          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-          adb shell input keyevent 82
-        env:
-          ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
-
-      - name: Verify emulator status
-        run: adb devices
 
       - name: Add Maven to PATH
-        run: echo "C:\\ProgramData\\chocolatey\\bin" >> $env:GITHUB_PATH
+        run: |
+          echo "C:\\ProgramData\\chocolatey\\bin" >> $env:GITHUB_PATH
 
       - name: Verify Maven installation
-        run: mvn -version
+        run: |
+          mvn -version
 
       - name: Run Android Tests
         run: |
