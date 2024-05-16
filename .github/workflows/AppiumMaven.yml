@@ -44,7 +44,7 @@ jobs:
 
       - name: Accept SDK licenses
         run: |
-          yes | sdkmanager --licenses
+          echo y | sdkmanager --licenses
 
       - name: Create AVD
         run: |
@@ -56,7 +56,6 @@ jobs:
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
-
       - name: Add Maven to PATH
         run: |
           echo "C:\\ProgramData\\chocolatey\\bin" >> $env:GITHUB_PATH
@@ -67,7 +66,7 @@ jobs:
 
       - name: Set JAVA_HOME
         run: |
-          echo "JAVA_HOME=$JAVA_HOME" >> $env:GITHUB_ENV
+          echo "JAVA_HOME=C:\\hostedtoolcache\\windows\\Java_Temurin-Hotspot_jdk\\17.0.0-4\\x64" >> $env:GITHUB_ENV
         env:
           JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.0-4\x64
 
