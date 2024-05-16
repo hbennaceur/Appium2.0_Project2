@@ -53,12 +53,7 @@ jobs:
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
-      - name: Wait for emulator to boot
-        run: |
-          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-          adb shell input keyevent 82
-        env:
-          ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
+
 
       - name: Run Android tests
         run: |
