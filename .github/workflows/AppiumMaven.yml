@@ -57,6 +57,7 @@ jobs:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
 
+
       - name: Add Maven to PATH
         run: |
           echo "C:\\ProgramData\\chocolatey\\bin" >> $GITHUB_PATH
@@ -65,8 +66,9 @@ jobs:
         run: |
           mvn -version
 
-      - name: Run Android tests
+      - name: Set JAVA_HOME and run tests
         run: |
+          echo "JAVA_HOME: $JAVA_HOME"
           mvn -Dtest=TestRunner test
         env:
           JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.0-4\x64
