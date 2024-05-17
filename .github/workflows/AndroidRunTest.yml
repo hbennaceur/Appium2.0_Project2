@@ -32,7 +32,8 @@
             appium driver install uiautomator2@3.0.1
         - name: Start Appium server
           run: |
-            appium &
+            appium &> appium.log &
+            Start-Sleep -Seconds 10
           env:
             ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
             ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
@@ -58,6 +59,7 @@
         - name: Start emulator
           run: |
             emulator -avd test -no-window -no-audio -no-boot-anim &
+            Start-Sleep -Seconds 60
           env:
             ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
@@ -75,3 +77,6 @@
           env:
             ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
             ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
+        - name: Display Appium Logs
+          run: |
+            type appium.log
