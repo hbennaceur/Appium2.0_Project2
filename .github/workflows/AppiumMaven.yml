@@ -27,7 +27,12 @@ jobs:
         run: |
           npm install -g appium@v2.5.1
           appium -v
-
+      - name: Start Appium server
+        run: |
+          appium &
+        env:
+            ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
+            ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
