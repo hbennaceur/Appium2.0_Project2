@@ -29,7 +29,7 @@
             appium -v
         - name: Install UIAutomator2 driver for Appium
           run: |
-            appium driver install uiautomator2
+            appium driver install uiautomator2@3.0.1
         - name: Start Appium server
           run: |
             appium &
