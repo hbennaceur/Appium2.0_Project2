@@ -56,7 +56,7 @@ public class Base {
                 des.setCapability(MobileCapabilityType.DEVICE_NAME, "Pixel_5");
                 des.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
                 des.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
-                des.setCapability("isHeadless",true);
+                //des.setCapability("isHeadless",true);
                 des.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, "io.appium.android.apis");
                 des.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, "io.appium.android.apis.ApiDemos");
                 des.setCapability(AndroidMobileCapabilityType.AVD, "Pixel_5");
