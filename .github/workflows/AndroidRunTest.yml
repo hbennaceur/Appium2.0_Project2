@@ -1,26 +1,3 @@
-  Skip to content
-    Navigation Menu
-    BedouiKhaledEQA
-    /
-    Appium2.0_Project2
-    
-    Type / to search
-    
-    Code
-    Issues
-    Pull requests
-    Actions
-    Projects
-    Wiki
-    Security
-    Insights
-    Settings
-    Run android tests in GitHub Runner
-    Base.java #94
-    Jobs
-    Run details
-    Workflow file for this run
-    .github/workflows/AppiumMaven.yml at d825a00
   name: Run android tests in GitHub Runner
 
   on:
