@@ -23,16 +23,32 @@ jobs:
         with:
           node-version: '16.13.0'
 
+      - name: Cache Appium and Node modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install Appium
         run: |
           npm install -g appium@v2.5.1
           appium -v
-      - name: Start Appium server
+      - name: Install UIAutomator2 driver for Appium
         run: |
-          appium &
-        env:
-            ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
-            ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
+          appium driver install uiautomator2
+      - name: Cache Android SDK
+        uses: actions/cache@v2
+        with:
+          path: |
+            C:\Users\runneradmin\AppData\Local\Android\Sdk
+          key: ${{ runner.os }}-android-sdk-${{ matrix.api-level }}
+          restore-keys: |
+            ${{ runner.os }}-android-sdk-
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
@@ -61,6 +77,18 @@ jobs:
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
+      - name: Wait for emulator to be ready
+        run: |
+          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+        env:
+          ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
+
+      - name: Start Appium server
+        run: |
+          appium &
+        env:
+          ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
+          ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
       - name: Add Maven to PATH
         run: |
