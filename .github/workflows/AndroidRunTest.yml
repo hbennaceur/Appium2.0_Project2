@@ -33,10 +33,14 @@
         - name: Start Appium server
           run: |
             appium &> appium.log &
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 20
           env:
             ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
             ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
+        - name: Verify Appium server
+          run: |
+            curl -X GET http://127.0.0.1:4723/wd/hub/status
+
         - name: Set up Android SDK
           uses: android-actions/setup-android@v2
           with:
@@ -59,7 +63,7 @@
         - name: Start emulator
           run: |
             emulator -avd test -no-window -no-audio -no-boot-anim &
-            Start-Sleep -Seconds 60
+            Start-Sleep -Seconds 120
           env:
             ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
