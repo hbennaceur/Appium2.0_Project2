@@ -39,7 +39,7 @@
             ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
         - name: Verify Appium server
           run: |
-            curl -X GET http://127.0.0.1:4723/wd/hub/status
+            curl -X GET http://127.0.0.1:4723/status
 
         - name: Set up Android SDK
           uses: android-actions/setup-android@v2
