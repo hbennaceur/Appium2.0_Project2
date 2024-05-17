@@ -27,9 +27,12 @@ jobs:
         run: |
           npm install -g appium@v2.5.1
           appium -v
+      - name: Install UIAutomator2 driver for Appium
+        run: |
+          appium driver install uiautomator2    
       - name: Start Appium server
         run: |
-          appium &
+          appium 
         env:
             ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
             ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
