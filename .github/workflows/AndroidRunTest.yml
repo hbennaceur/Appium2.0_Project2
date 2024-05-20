@@ -61,13 +61,11 @@ jobs:
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
-      - name: Add Maven to PATH
-        run: |
-          echo "C:\\ProgramData\\chocolatey\\bin" >> $env:GITHUB_PATH
+      - name: Check Appium server status
+        run: appium status
 
-      - name: Verify Maven installation
-        run: |
-          mvn -version
+      - name: Check Android emulator status
+        run: adb devices
 
       - name: Start Appium server
         run: |

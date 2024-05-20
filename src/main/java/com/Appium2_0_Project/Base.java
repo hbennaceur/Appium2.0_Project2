@@ -43,7 +43,7 @@ public class Base {
         DesiredCapabilities des =new DesiredCapabilities();
         des.setCapability(MobileCapabilityType.PLATFORM_NAME,platformName);
         des.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT,300);
-        URL url = new URL("http://192.168.39.83:4723/");
+        URL url = new URL("http://127.0.0.1:4723/");
 
 
         switch (platformName) {
