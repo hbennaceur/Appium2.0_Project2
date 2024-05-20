@@ -66,8 +66,10 @@ jobs:
 
       - name: Start Appium server
         run: |
-          appium 
-          Start-Sleep -Seconds 20
+          appium &
+           nohup appium > appium.log 2>&1 &
+          sleep 10
+
         env:
           ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
