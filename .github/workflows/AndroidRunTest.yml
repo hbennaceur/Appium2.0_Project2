@@ -71,7 +71,7 @@ jobs:
 
       - name: Start Appium server
         run: |
-          appium --log-level info --base-path /wd/hub &
+          appium &
           Start-Sleep -Seconds 20
         env:
           ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
