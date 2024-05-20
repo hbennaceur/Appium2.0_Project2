@@ -61,19 +61,20 @@ jobs:
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
-      - name: Check Appium server status
-        run: appium --help | grep status
-
       - name: Check Android emulator status
         run: adb devices
 
       - name: Start Appium server
         run: |
           appium &
-          Start-Sleep -Seconds 20
         env:
           ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
+
+      - name: Verify Appium server is running
+        run: |
+          curl http://127.0.0.1:4723/status
+          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
 
       - name: Run Android Tests
         run: |
