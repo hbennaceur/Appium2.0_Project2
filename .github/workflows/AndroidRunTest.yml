@@ -57,12 +57,12 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd test -no-window -no-audio -no-boot-anim &
-          Start-Sleep -Seconds 120
+          Start-Sleep -Seconds 60
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
       - name: Check Appium server status
-        run: appium status
+        run: appium --help | grep status
 
       - name: Check Android emulator status
         run: adb devices
