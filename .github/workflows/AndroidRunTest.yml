@@ -1,4 +1,4 @@
-name: Exécuter des tests Android dans le GitHub Runner
+name: Run Android tests in GitHub Runner
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
 
       - name: Install Appium
         run: |
-          npm install -g appium@v2.5.1
+          npm install -g appium@2.5.1
           appium -v
 
       - name: Install UIAutomator2 driver for Appium
@@ -71,7 +71,7 @@ jobs:
 
       - name: Start Appium server
         run: |
-          appium &
+          appium --log-level info --base-path /wd/hub &
           Start-Sleep -Seconds 20
         env:
           ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
