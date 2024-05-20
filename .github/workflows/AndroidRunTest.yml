@@ -34,18 +34,27 @@
             appium driver install uiautomator2@3.0.1
 
     StartServerAppium:
+      name: Start Appium Server
+
+      runs-on: windows-latest
+      needs: [test]
+      steps:
         - name: Start Appium server
           run: |
-            appium &
+            appium 
             Start-Sleep -Seconds 20
           env:
             ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
             ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
-        - name: Verify Appium server
-          run: |
-            curl -X GET http://127.0.0.1:4723/status
 
+
+    Setup:
+      name: Setup Environment
+
+      runs-on: windows-latest
+      needs: [ test ]
+      steps:
         - name: Set up Android SDK
           uses: android-actions/setup-android@v2
           with:
