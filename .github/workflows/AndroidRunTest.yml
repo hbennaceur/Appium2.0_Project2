@@ -75,9 +75,30 @@ jobs:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
       - name: Verify Appium server is running
+        shell: pwsh
         run: |
-          curl http://127.0.0.1:4723/status
-          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
+            $maxRetries = 10
+            $retryCount = 0
+            $url = "http://127.0.0.1:4723/status"
+            
+            while ($retryCount -lt $maxRetries) {
+              try {
+                $response = Invoke-WebRequest -Uri $url -UseBasicParsing
+                if ($response.StatusCode -eq 200) {
+                  Write-Host "Appium server is running"
+                  break
+                }
+              } catch {
+                Write-Host "Appium server is not running, retrying..."
+                Start-Sleep -Seconds 5
+                $retryCount++
+              }
+            }
+            
+            if ($retryCount -eq $maxRetries) {
+              Write-Host "Appium server failed to start after $maxRetries attempts"
+              exit 1
+            }
 
       - name: Run Android Tests
         run: |
