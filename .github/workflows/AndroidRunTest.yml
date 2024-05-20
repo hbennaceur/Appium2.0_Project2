@@ -7,7 +7,8 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: macos-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -25,26 +26,16 @@ jobs:
 
       - name: Install Appium
         run: |
-          npm install -g appium@latest
-          appium -v
-
-      - name: Install UIAutomator2 driver for Appium
-        run: |
-          appium driver install uiautomator2@3.0.1
+          npm install -g appium@2.5.1
+          npm install -g appium-uiautomator2-driver@3.0.1
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
-          api-levels: 34
+          api-levels: 34  # Réglage du niveau d'API sur 34
           target: default
           arch: x86_64
           channel: stable
-
-      - name: Install Android SDK packages
-        run: |
-          sdkmanager --install 'system-images;android-34;google_apis;x86_64'
-          sdkmanager --install 'platform-tools'
-          sdkmanager --install 'emulator'
 
       - name: Accept SDK licenses
         run: |
@@ -55,38 +46,48 @@ jobs:
           echo no | avdmanager create avd -n test -k "system-images;android-34;google_apis;x86_64" --force
 
       - name: Start emulator
-        run: |
-          emulator -avd test -no-window -no-audio -no-boot-anim &
-          Start-Sleep -Seconds 60
-        env:
-          ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
+        run: emulator -avd test -no-window -no-audio -no-boot-anim &
 
-      - name: Check Android emulator status
-        run: adb devices
+      - name: Wait for emulator to start
+        run: sleep 60
 
       - name: Start Appium server
         run: |
           appium &
-           nohup appium > appium.log 2>&1 &
-          sleep 10
-
-        env:
-          ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
-          ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
+          nohup appium > appium.log 2>&1 &
+          sleep 60
 
       - name: Verify Appium server is running
+        shell: pwsh
         run: |
-          curl http://127.0.0.1:4723/status
-          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
+          $maxRetries = 10
+          $retryCount = 0
+          $url = "http://127.0.0.1:4723/status"
+          
+          while ($retryCount -lt $maxRetries) {
+            try {
+              $response = Invoke-WebRequest -Uri $url -UseBasicParsing
+              if ($response.StatusCode -eq 200) {
+                Write-Host "Appium server is running"
+                break
+              }
+            } catch {
+              Write-Host "Appium server is not running, retrying..."
+              Start-Sleep -Seconds 5
+              $retryCount++
+            }
+          }
+          
+          if ($retryCount -eq $maxRetries) {
+            Write-Host "Appium server failed to start after $maxRetries attempts"
+            exit 1
+          }
 
       - name: Run Android Tests
         run: |
           echo "JAVA_HOME: $env:JAVA_HOME"
           mvn -Dtest=TestRunner test
-        env:
-          ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
-          ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
       - name: Display Appium Logs
         run: |
-          type appium.log
+          cat appium.log
