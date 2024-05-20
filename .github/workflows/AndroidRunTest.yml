@@ -32,7 +32,7 @@
             appium driver install uiautomator2@3.0.1
         - name: Start Appium server
           run: |
-            appium &> appium.log &
+            appium &> appium.log 
             Start-Sleep -Seconds 20
           env:
             ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
