@@ -6,6 +6,8 @@
     workflow_dispatch:
 
   jobs:
+
+
     test:
       runs-on: windows-latest
       steps:
@@ -30,6 +32,8 @@
         - name: Install UIAutomator2 driver for Appium
           run: |
             appium driver install uiautomator2@3.0.1
+
+    StartServerAppium:
         - name: Start Appium server
           run: |
             appium &
