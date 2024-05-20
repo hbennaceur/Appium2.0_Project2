@@ -5,6 +5,7 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
@@ -42,7 +43,7 @@ public class Base {
         DesiredCapabilities des =new DesiredCapabilities();
         des.setCapability(MobileCapabilityType.PLATFORM_NAME,platformName);
         des.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT,300);
-        URL url = new URL("http://192.168.1.107:4723/wd/hub");
+        URL url = new URL("http://192.168.39.83:4723/");
 
 
         switch (platformName) {
@@ -54,7 +55,7 @@ public class Base {
                 .setAutomationName("UiAutomator2")
                 .setApp(appUrl);*/
                 des.setCapability(MobileCapabilityType.DEVICE_NAME, "Pixel_5");
-                des.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
+                des.setCapability(MobileCapabilityType.PLATFORM_NAME, Platform.ANDROID);
                 des.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
                 //des.setCapability("isHeadless",true);
                 des.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, "io.appium.android.apis");
@@ -62,11 +63,11 @@ public class Base {
                 des.setCapability(AndroidMobileCapabilityType.AVD, "Pixel_5");
                 des.setCapability(AndroidMobileCapabilityType.AVD_LAUNCH_TIMEOUT, 180000);
                 des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pin");
-               // des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pattern");
+                // des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pattern");
                 des.setCapability(AndroidMobileCapabilityType.UNLOCK_KEY,"");
                 // des.setCapability(MobileCapabilityType.APP,appUrl);
-              //  System.out.println("Session id" + driver.getSessionId());
-              driver=  new AndroidDriver(url, des);
+                //  System.out.println("Session id" + driver.getSessionId());
+                driver=  new AndroidDriver(url, des);
             }
             case "IOS" -> {
                 des.setCapability(MobileCapabilityType.DEVICE_NAME, "Iphone 11");
@@ -78,4 +79,4 @@ public class Base {
             default -> throw new Exception("Invalid platform");
         }
     }}
-//
+
