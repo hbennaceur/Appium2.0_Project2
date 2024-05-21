@@ -25,7 +25,7 @@ jobs:
 
       - name: Install Appium
         run: |
-          npm install -g appium@latest
+          npm install -g appium@2.5.1
           appium -v
         shell: bash
 
@@ -55,6 +55,7 @@ jobs:
         run: |
           emulator -avd test -no-window -no-audio -no-boot-anim &
           adb wait-for-device
+          sleep 60
           adb shell input keyevent 82
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
@@ -62,9 +63,26 @@ jobs:
       - name: Check Android emulator status
         run: adb devices
 
+      - name: Wait for emulator to boot
+        run: |
+          boot_completed=false
+          timeout=300
+          while [ $timeout -gt 0 ]; do
+            if adb shell getprop sys.boot_completed | grep -q "1"; then
+              boot_completed=true
+              break
+            fi
+            sleep 5
+            timeout=$((timeout - 5))
+          done
+          if [ "$boot_completed" = false ]; then
+            echo "Emulator boot timed out"
+            exit 1
+          fi
+
       - name: Start Appium server
         run: |
-          appium --address 0.0.0.0 --port 4723 > appium.log 2>&1 &
+          appium --address 127.0.0.1 --port 4723 > appium.log 2>&1 &
           Start-Sleep -Seconds 20
         shell: pwsh
         env:
@@ -78,7 +96,7 @@ jobs:
 
       - name: Run Android Tests
         run: |
-          echo "JAVA_HOME: $JAVA_HOME"
+          echo "JAVA_HOME: $env:JAVA_HOME"
           mvn -Dtest=TestRunner test
         env:
           ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
@@ -86,5 +104,5 @@ jobs:
 
       - name: Display Appium Logs
         run: |
-          cat appium.log
-        shell: bash
+          type appium.log
+        shell: pwsh
