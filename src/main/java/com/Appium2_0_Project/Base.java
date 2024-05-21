@@ -45,7 +45,7 @@ public class Base {
         URL url = new URL("http://127.0.0.1:4723/");
 
         switch (platformName) {
-            case "Android":
+            case "Android" -> {
                 String appUrl = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "ApiDemos-debug.apk";
                 des.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
                 des.setCapability(MobileCapabilityType.PLATFORM_NAME, Platform.ANDROID);
@@ -56,17 +56,19 @@ public class Base {
                 des.setCapability("avdLaunchTimeout", 180000);
                 des.setCapability("unlockType", "pin");
                 des.setCapability("unlockKey", "");
+                des.setCapability("noWindow", true); // Run in headless mode
+                des.setCapability("disableWindowAnimation", true); // Disable animations for faster execution
+
                 driver = new AndroidDriver(url, des);
-                break;
-            case "IOS":
+            }
+            case "IOS" -> {
                 des.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 11");
                 des.setCapability(MobileCapabilityType.PLATFORM_NAME, "IOS");
                 des.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
                 des.setCapability("bundleId", "com.example.apple-samplecode.UICatalog");
                 driver = new IOSDriver(url, des);
-                break;
-            default:
-                throw new Exception("Invalid platform");
+            }
+            default -> throw new Exception("Invalid platform");
         }
     }
     }
