@@ -75,11 +75,6 @@ jobs:
           if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
         shell: pwsh
 
-      - name: Print Android SDK Paths
-        run: |
-          echo "ANDROID_HOME: $env:ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT: $env:ANDROID_SDK_ROOT"
-        shell: pwsh
 
       - name: Run Android Tests
         run: |
