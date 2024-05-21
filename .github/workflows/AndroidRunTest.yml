@@ -25,7 +25,7 @@ jobs:
 
       - name: Install Appium
         run: |
-          npm install -g appium@2.5.1
+          npm install -g appium@latest
           appium -v
         shell: bash
 
@@ -54,7 +54,8 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd test -no-window -no-audio -no-boot-anim &
-          Start-Sleep -Seconds 60
+          adb wait-for-device
+          adb shell input keyevent 82
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
@@ -63,21 +64,21 @@ jobs:
 
       - name: Start Appium server
         run: |
-          appium &
-        shell: bash
+          appium --address 0.0.0.0 --port 4723 > appium.log 2>&1 &
+          Start-Sleep -Seconds 20
+        shell: pwsh
         env:
           ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
       - name: Verify Appium server is running
         run: |
-          curl http://127.0.0.1:4723/status
-          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
-        shell: pwsh
+          curl http://127.0.0.1:4723/status || { echo "Appium server is not running"; exit 1; }
+        shell: bash
 
       - name: Run Android Tests
         run: |
-          echo "JAVA_HOME: $env:JAVA_HOME"
+          echo "JAVA_HOME: $JAVA_HOME"
           mvn -Dtest=TestRunner test
         env:
           ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
@@ -85,4 +86,5 @@ jobs:
 
       - name: Display Appium Logs
         run: |
-          type appium.log
+          cat appium.log
+        shell: bash
