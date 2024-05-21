@@ -56,7 +56,7 @@ jobs:
           emulator -avd test -no-window -no-audio -no-boot-anim &
           Start-Sleep -Seconds 60
         env:
-          ANDROID_SDK_ROOT: C:\Users\KhaledBEDOUI\AppData\Local\Android\Sdk
+          ANDROID_SDK_ROOT: ${{ runner.temp }}/Android/Sdk
 
       - name: Check Android emulator status
         run: adb devices
@@ -66,8 +66,8 @@ jobs:
           appium &
         shell: bash
         env:
-          ANDROID_HOME: C:\Users\KhaledBEDOUI\AppData\Local\Android\Sdk
-          ANDROID_SDK_ROOT: C:\Users\KhaledBEDOUI\AppData\Local\Android\Sdk
+          ANDROID_HOME: ${{ runner.temp }}/Android/Sdk
+          ANDROID_SDK_ROOT: ${{ runner.temp }}/Android/Sdk
 
       - name: Verify Appium server is running
         run: |
@@ -80,8 +80,8 @@ jobs:
           echo "JAVA_HOME: $env:JAVA_HOME"
           mvn -Dtest=TestRunner test
         env:
-          ANDROID_HOME: C:\Users\KhaledBEDOUI\AppData\Local\Android\Sdk
-          ANDROID_SDK_ROOT: C:\Users\KhaledBEDOUI\AppData\Local\Android\Sdk
+          ANDROID_HOME: ${{ runner.temp }}/Android/Sdk
+          ANDROID_SDK_ROOT: ${{ runner.temp }}/Android/Sdk
 
       - name: Display Appium Logs
         run: |
