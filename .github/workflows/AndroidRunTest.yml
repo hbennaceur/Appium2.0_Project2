@@ -54,44 +54,26 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd test -no-window -no-audio -no-boot-anim &
-          adb wait-for-device
-          sleep 60
+          Start-Sleep -Seconds 60
         env:
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
       - name: Check Android emulator status
         run: adb devices
 
-      - name: Wait for emulator to boot
-        run: |
-          boot_completed=false
-          timeout=300
-          while [ $timeout -gt 0 ]; do
-            if adb shell getprop sys.boot_completed | grep -q "1"; then
-              boot_completed=true
-              break
-            fi
-            sleep 5
-            timeout=$((timeout - 5))
-          done
-          if [ "$boot_completed" = false ]; then
-            echo "Emulator boot timed out"
-            exit 1
-          fi
-
       - name: Start Appium server
         run: |
-          appium --address 127.0.0.1 --port 4723 > appium.log 2>&1 &
-          Start-Sleep -Seconds 20
-        shell: pwsh
+          appium &
+        shell: bash
         env:
           ANDROID_HOME: C:\Users\runneradmin\AppData\Local\Android\Sdk
           ANDROID_SDK_ROOT: C:\Users\runneradmin\AppData\Local\Android\Sdk
 
       - name: Verify Appium server is running
         run: |
-          curl http://127.0.0.1:4723/status || { echo "Appium server is not running"; exit 1; }
-        shell: bash
+          curl http://127.0.0.1:4723/status
+          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
+        shell: pwsh
 
       - name: Run Android Tests
         run: |
@@ -104,4 +86,3 @@ jobs:
       - name: Display Appium Logs
         run: |
           type appium.log
-        shell: pwsh
