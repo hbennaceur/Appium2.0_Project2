@@ -3,7 +3,6 @@ package com.Appium2_0_Project;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -40,43 +39,35 @@ public class Base {
     }
 
     public static void InitializeDriver(String platformName) throws Exception {
-        DesiredCapabilities des =new DesiredCapabilities();
-        des.setCapability(MobileCapabilityType.PLATFORM_NAME,platformName);
-        des.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT,300);
+        DesiredCapabilities des = new DesiredCapabilities();
+        des.setCapability(MobileCapabilityType.PLATFORM_NAME, platformName);
+        des.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 300);
         URL url = new URL("http://127.0.0.1:4723/");
 
-
         switch (platformName) {
-            case "Android" -> {
+            case "Android":
                 String appUrl = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "ApiDemos-debug.apk";
-        /*UiAutomator2Options options =new UiAutomator2Options().
-                setDeviceName("Pixel_5")
-                .setUdid("emulator-5554")
-                .setAutomationName("UiAutomator2")
-                .setApp(appUrl);*/
-                des.setCapability(MobileCapabilityType.DEVICE_NAME, "Pixel_5");
+                des.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
                 des.setCapability(MobileCapabilityType.PLATFORM_NAME, Platform.ANDROID);
                 des.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
-                //des.setCapability("isHeadless",true);
-                des.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, "io.appium.android.apis");
-                des.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, "io.appium.android.apis.ApiDemos");
-                des.setCapability(AndroidMobileCapabilityType.AVD, "Pixel_5");
-                des.setCapability(AndroidMobileCapabilityType.AVD_LAUNCH_TIMEOUT, 180000);
-                des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pin");
-                // des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pattern");
-                des.setCapability(AndroidMobileCapabilityType.UNLOCK_KEY,"");
-                // des.setCapability(MobileCapabilityType.APP,appUrl);
-                //  System.out.println("Session id" + driver.getSessionId());
-                driver=  new AndroidDriver(url, des);
-            }
-            case "IOS" -> {
-                des.setCapability(MobileCapabilityType.DEVICE_NAME, "Iphone 11");
+                des.setCapability("appPackage", "io.appium.android.apis");
+                des.setCapability("appActivity", "io.appium.android.apis.ApiDemos");
+                des.setCapability("avd", "emulator-5554");
+                des.setCapability("avdLaunchTimeout", 180000);
+                des.setCapability("unlockType", "pin");
+                des.setCapability("unlockKey", "");
+                driver = new AndroidDriver(url, des);
+                break;
+            case "IOS":
+                des.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 11");
                 des.setCapability(MobileCapabilityType.PLATFORM_NAME, "IOS");
                 des.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
-                des.setCapability("bundleId", "com.exemple.apple-samplecode.UICatalog");
-                driver =new IOSDriver(url, des);
-            }
-            default -> throw new Exception("Invalid platform");
+                des.setCapability("bundleId", "com.example.apple-samplecode.UICatalog");
+                driver = new IOSDriver(url, des);
+                break;
+            default:
+                throw new Exception("Invalid platform");
         }
-    }}
+    }
+    }
 
