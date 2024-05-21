@@ -45,7 +45,7 @@ jobs:
 
       - name: Accept SDK licenses
         run: |
-          yes | sdkmanager --licenses  # Correction pour accepter les licences
+          echo y | sdkmanager --licenses
 
       - name: Create AVD
         run: |
@@ -54,11 +54,18 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd test -no-window -no-audio -no-boot-anim &
-          adb wait-for-device  # Attendre que l'appareil soit prêt
-          adb shell input keyevent 82  # Déverrouiller l'écran
           Start-Sleep -Seconds 60
         env:
           ANDROID_SDK_ROOT: ${{ runner.temp }}/Android/Sdk
+
+      - name: Check Android SDK path
+        run: |
+            echo "ANDROID_HOME: $env:ANDROID_HOME"
+            echo "ANDROID_SDK_ROOT: $env:ANDROID_SDK_ROOT"
+            dir "${{ runner.temp }}/Android/Sdk"
+        env:
+            ANDROID_HOME: ${{ runner.temp }}/Android/Sdk
+            ANDROID_SDK_ROOT: ${{ runner.temp }}/Android/Sdk    
 
       - name: Check Android emulator status
         run: adb devices
