@@ -56,8 +56,8 @@ public class Base {
                 des.setCapability("avdLaunchTimeout", 180000);
                 des.setCapability("unlockType", "pin");
                 des.setCapability("unlockKey", "");
-                des.setCapability("noWindow", true); // Run in headless mode
-                des.setCapability("disableWindowAnimation", true); // Disable animations for faster execution
+               // des.setCapability("noWindow", true); // Run in headless mode
+               // des.setCapability("disableWindowAnimation", true); // Disable animations for faster execution
 
                 driver = new AndroidDriver(url, des);
             }
