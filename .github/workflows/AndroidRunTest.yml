@@ -45,7 +45,7 @@ jobs:
 
       - name: Accept SDK licenses
         run: |
-          echo y | sdkmanager --licenses
+          yes | sdkmanager --licenses
 
       - name: Create AVD
         run: |
@@ -54,6 +54,8 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd test -no-window -no-audio -no-boot-anim &
+          adb wait-for-device
+          adb shell input keyevent 82
           Start-Sleep -Seconds 60
         env:
           ANDROID_SDK_ROOT: ${{ runner.temp }}/Android/Sdk
@@ -72,12 +74,10 @@ jobs:
       - name: Verify Appium server is running
         run: |
           curl http://127.0.0.1:4723/status
-          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
         shell: pwsh
 
       - name: Run Android Tests
         run: |
-          echo "JAVA_HOME: $env:JAVA_HOME"
           mvn -Dtest=TestRunner test
         env:
           ANDROID_HOME: ${{ runner.temp }}/Android/Sdk
