@@ -72,6 +72,9 @@ jobs:
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
+      - name: Install APK on emulator
+        run: adb install https://github.com/BedouiKhaledEQA/Appium2.0_Project2/blob/master/src/main/resources/ApiDemos-debug.apk
+
 
       - name: Start Appium server
         run: |
