@@ -64,7 +64,7 @@ public class Base {
                 des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pin");
                 // des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pattern");
                 des.setCapability(AndroidMobileCapabilityType.UNLOCK_KEY,"");
-                // des.setCapability(MobileCapabilityType.APP,appUrl);
+                des.setCapability(MobileCapabilityType.APP,appUrl);
                 //  System.out.println("Session id" + driver.getSessionId());
                 // des.setCapability("noWindow", true); // Run in headless mode
                 // des.setCapability("disableWindowAnimation", true); // Disable animations for faster execution

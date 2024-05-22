@@ -76,17 +76,6 @@ jobs:
             adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
         shell: bash
 
-      - name: Install application
-        run: |
-            adb install src/main/resources/ApiDemos-debug.apk
-        shell: bash
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-
-
-      - name: Install APK on emulator
-        run: adb install https://github.com/BedouiKhaledEQA/Appium2.0_Project2/blob/master/src/main/resources/ApiDemos-debug.apk
 
 
       - name: Start Appium server
