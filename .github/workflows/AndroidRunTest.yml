@@ -49,11 +49,11 @@ jobs:
 
       - name: Create AVD
         run: |
-          echo no | avdmanager create avd -n test -k "system-images;android-34;google_apis;x86_64" --force
+          echo no | avdmanager create avd -n Pixel_5 -k "system-images;android-34;google_apis;x86_64" --force
 
       - name: Start emulator
         run: |
-          emulator -avd test -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
+          emulator -avd Pixel_5 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
           Start-Sleep -Seconds 60
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
