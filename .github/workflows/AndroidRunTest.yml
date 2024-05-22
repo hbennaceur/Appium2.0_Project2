@@ -71,10 +71,6 @@ jobs:
           Start-Sleep -Seconds 120
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-      - name: Wait for emulator to be ready
-        run: |
-            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-        shell: bash
 
 
 
