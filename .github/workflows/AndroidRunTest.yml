@@ -68,15 +68,18 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd Pixel_5 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
-          adb wait-for-device
-          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-
+          Start-Sleep -Seconds 120
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Install application
         run: |
             adb install src/main/resources/ApiDemos-debug.apk
+        shell: bash
+
+      - name: Verify emulator is running
+        run: |
+            adb devices
         shell: bash
 
 
