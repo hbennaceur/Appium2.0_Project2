@@ -65,12 +65,6 @@ jobs:
         run: |
           avdmanager list avd
 
-      - name: Debug ADB
-        run: |
-          adb get-state
-          adb shell getprop ro.product.model
-          adb shell getprop sys.boot_completed
-
       - name: Start emulator
         run: |
           emulator -avd Pixel_5 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
