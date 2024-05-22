@@ -50,11 +50,19 @@ jobs:
       - name: Create AVD
         run: |
           echo no | avdmanager create avd -n Pixel_5 -k "system-images;android-34;google_apis;x86_64" --force
+      - name: List available AVDs
+        run: |
+            avdmanager list avd
 
+      - name: Debug ADB
+        run: |
+              adb get-state
+              adb shell getprop ro.product.model
+              adb shell getprop sys.boot_completed
       - name: Start emulator
         run: |
           emulator -avd Pixel_5 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
-          Start-Sleep -Seconds 60
+          Start-Sleep -Seconds 120
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
