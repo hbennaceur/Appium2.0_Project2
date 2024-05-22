@@ -65,14 +65,15 @@ jobs:
         run: |
           avdmanager list avd
 
-      
-
       - name: Start emulator
         run: |
+          echo "Starting the emulator"
           emulator -avd Pixel_5 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
-          Start-Sleep -Seconds 180
+          sleep 5
           adb wait-for-device
-          adb shell getprop init.svc.bootanim | grep -m 1 'stopped'
+          timeout 180 sh -c 'until adb shell getprop sys.boot_completed | grep -m 1 1; do echo "Waiting for emulator to start..."; sleep 5; done'
+          echo "Emulator started"
+        shell: bash
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
@@ -81,6 +82,15 @@ jobs:
           adb devices
           adb shell getprop sys.boot_completed
           adb shell input keyevent 82
+          adb shell am start -a android.intent.action.MAIN -c android.intent.category.HOME
+        shell: bash
+
+      - name: Restart ADB server
+        run: |
+          adb kill-server
+          adb start-server
+          adb devices
+        shell: bash
 
       - name: Start Appium server
         run: |
