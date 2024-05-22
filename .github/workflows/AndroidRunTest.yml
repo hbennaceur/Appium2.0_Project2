@@ -49,9 +49,13 @@ jobs:
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager --install 'platform-tools' 'emulator' 'system-images;android-34;google_apis;x86_64'
+          sdkmanager --install 'system-images;android-34;google_apis;x86_64'
+          sdkmanager --install 'platform-tools'
+          sdkmanager --install 'emulator'
+
+      - name: Accept SDK licenses
+        run: |
           echo y | sdkmanager --licenses
-        shell: bash
 
       - name: Create AVD
         run: |
@@ -67,6 +71,7 @@ jobs:
           Start-Sleep -Seconds 120
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
 
       - name: Start Appium server
         run: |
