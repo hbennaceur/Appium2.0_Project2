@@ -65,11 +65,7 @@ jobs:
         run: |
           avdmanager list avd
 
-      - name: Debug ADB
-        run: |
-          adb get-state
-          adb shell getprop ro.product.model
-          adb shell getprop sys.boot_completed
+      
 
       - name: Start emulator
         run: |
