@@ -72,6 +72,10 @@ jobs:
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
+      - name: Install application
+        run: |
+            adb install src/main/resources/ApiDemos-debug.apk
+        shell: bash
 
 
       - name: Start Appium server
