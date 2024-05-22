@@ -12,6 +12,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up environment variables
+        run: |
+          echo "Setting up environment variables"
+          export ANDROID_HOME=${{ env.ANDROID_SDK_ROOT }}
+          export PATH=$PATH:$ANDROID_HOME/tools
+          export PATH=$PATH:$ANDROID_HOME/platform-tools
+          echo "ANDROID_HOME is set to: $ANDROID_HOME"
+          echo "PATH is set to: $PATH"
+        shell: bash
+
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
@@ -50,34 +60,31 @@ jobs:
       - name: Create AVD
         run: |
           echo no | avdmanager create avd -n Pixel_5 -k "system-images;android-34;google_apis;x86_64" --force
+
       - name: List available AVDs
         run: |
-            avdmanager list avd
+          avdmanager list avd
 
       - name: Debug ADB
         run: |
-              adb get-state
-              adb shell getprop ro.product.model
-              adb shell getprop sys.boot_completed
+          adb get-state
+          adb shell getprop ro.product.model
+          adb shell getprop sys.boot_completed
+
       - name: Start emulator
         run: |
           emulator -avd Pixel_5 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
-          Start-Sleep -Seconds 120
+          Start-Sleep -Seconds 180
+          adb wait-for-device
+          adb shell getprop init.svc.bootanim | grep -m 1 'stopped'
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
-      - name: Set environment variables
-        run: |
-          echo "Setting up environment variables"
-          export ANDROID_HOME=${{ env.ANDROID_SDK_ROOT }}
-          export PATH=$PATH:$ANDROID_HOME/tools
-          export PATH=$PATH:$ANDROID_HOME/platform-tools
-          echo "ANDROID_HOME is set to: $ANDROID_HOME"
-          echo "PATH is set to: $PATH"
-        shell: bash
-
       - name: Check Android emulator status
-        run: adb devices
+        run: |
+          adb devices
+          adb shell getprop sys.boot_completed
+          adb shell input keyevent 82
 
       - name: Start Appium server
         run: |
