@@ -72,11 +72,6 @@ jobs:
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
-      - name: Check Android emulator status
-        run: |
-          adb devices
-          adb shell getprop sys.boot_completed
-          adb shell input keyevent 82
 
       - name: Start Appium server
         run: |
