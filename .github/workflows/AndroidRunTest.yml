@@ -68,7 +68,9 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd Pixel_5 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
-          Start-Sleep -Seconds 120
+          db wait-for-device
+          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
