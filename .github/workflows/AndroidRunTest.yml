@@ -55,15 +55,11 @@ jobs:
 
       - name: Accept SDK licenses
         run: |
-          echo y | sdkmanager --licenses
+          yes | sdkmanager --licenses
 
-      - name: Use Java 8 to create AVD
+      - name: Create AVD
         run: |
-          sudo apt-get install -y openjdk-8-jdk
-          export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-          export PATH=$JAVA_HOME/bin:$PATH
-          avdmanager create avd -n Pixel_5 -k "system-images;android-34;google_apis;x86_64" --force
-        shell: bash
+          echo no | avdmanager create avd -n Pixel_5 -k "system-images;android-34;google_apis;x86_64" --force
 
       - name: List available AVDs
         run: |
@@ -72,20 +68,18 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd Pixel_5 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
-          Start-Sleep -Seconds 120
+          adb wait-for-device
+          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+        shell: bash
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
-      - name: Install application
+      - name: Install APK on emulator
         run: |
-            adb install src/main/resources/ApiDemos-debug.apk
+          adb install src/main/resources/ApiDemos-debug.apk
         shell: bash
-
-      - name: Verify emulator is running
-        run: |
-            adb devices
-        shell: bash
-
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Start Appium server
         run: |
@@ -98,12 +92,12 @@ jobs:
       - name: Verify Appium server is running
         run: |
           curl http://127.0.0.1:4723/status
-          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
-        shell: pwsh
+          if ($?) { echo "Appium server is running" } else { echo "Appium server is not running"; exit 1 }
+        shell: bash
 
       - name: Run Android Tests
         run: |
-          echo "JAVA_HOME: $env:JAVA_HOME"
+          echo "JAVA_HOME: $JAVA_HOME"
           mvn -Dtest=TestRunner test
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
@@ -111,4 +105,5 @@ jobs:
 
       - name: Display Appium Logs
         run: |
-          type appium.log
+          cat appium.log
+        shell: bash
