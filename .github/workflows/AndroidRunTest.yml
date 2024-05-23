@@ -75,7 +75,7 @@ jobs:
       - name: Verify emulator is running
         run: |
               adb devices
-              shell: bash
+        shell: bash
       - name: Install application
         run: |
           adb install src/main/resources/ApiDemos-debug.apk
