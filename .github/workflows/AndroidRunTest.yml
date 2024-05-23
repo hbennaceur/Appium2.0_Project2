@@ -57,9 +57,13 @@ jobs:
         run: |
           echo y | sdkmanager --licenses
 
-      - name: Create AVD
+      - name: Use Java 8 to create AVD
         run: |
-          echo no | avdmanager create avd -n Pixel_5 -k "system-images;android-34;google_apis;x86_64" --force
+          sudo apt-get install -y openjdk-8-jdk
+          export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+          export PATH=$JAVA_HOME/bin:$PATH
+          avdmanager create avd -n Pixel_5 -k "system-images;android-34;google_apis;x86_64" --force
+        shell: bash
 
       - name: List available AVDs
         run: |
