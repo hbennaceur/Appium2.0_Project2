@@ -12,11 +12,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Ajoutez l'étape pour trouver le chemin de l'exécutable emulator ici
-      - name: Find emulator executable
-        run: |
-          echo "Emulator executable path:"
-          Get-Command emulator
 
       - name: Set up environment variables
         run: |
@@ -69,6 +64,12 @@ jobs:
         run: |
           echo no | avdmanager create avd -n Pixel_5_API_34 -k "system-images;android-34;google_apis;x86_64" --force
         timeout-minutes: 10
+
+      # Ajoutez l'étape pour trouver le chemin de l'exécutable emulator ici
+      - name: Find emulator executable
+        run: |
+          echo "Emulator executable path:"
+          Get-Command emulator  
 
       - name: List available AVDs
         run: |
