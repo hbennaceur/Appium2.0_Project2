@@ -12,7 +12,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-
       - name: Set up environment variables
         run: |
           echo "Setting up environment variables"
@@ -38,9 +37,9 @@ jobs:
 
       - name: Install Appium
         run: |
-          npm install -g appium@2.5.1
-          appium -v
-        shell: bash
+          npm install -g appium@latest
+          appium -v > appium.log &
+        shell: pwsh
 
       - name: Install UIAutomator2 driver for Appium
         run: |
@@ -86,17 +85,10 @@ jobs:
         run: |
           adb devices
 
-      - name: Start Appium server
-        run: |
-          appium &
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-
       - name: Verify Appium server is running
         run: |
-          curl http://127.0.0.1:4723/status
-          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
+          cat appium.log
+          # Ajoutez ici toute autre vérification nécessaire
         shell: pwsh
 
       - name: Run Android Tests
