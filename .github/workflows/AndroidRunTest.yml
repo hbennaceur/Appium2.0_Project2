@@ -68,8 +68,7 @@ jobs:
       # Ajoutez l'étape pour trouver le chemin de l'exécutable emulator ici
       - name: Find emulator executable
         run: |
-          echo "Emulator executable path:"
-          Get-Command emulator  
+          where emulator
 
       - name: List available AVDs
         run: |
