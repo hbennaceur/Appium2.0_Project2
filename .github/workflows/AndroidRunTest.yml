@@ -96,7 +96,7 @@ jobs:
       - name: Verify Appium server is running
         run: |
           curl http://127.0.0.1:4723/status
-          if ($LASTEXITCODE -eq 0) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
+          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
         shell: pwsh
 
       - name: Run Android Tests
