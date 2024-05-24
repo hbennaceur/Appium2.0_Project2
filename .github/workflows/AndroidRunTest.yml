@@ -62,11 +62,12 @@ jobs:
       - name: Create AVD
         run: |
           echo no | avdmanager create avd -n Pixel_5_API_34 -k "system-images;android-34;google_apis;x86_64" --force
+        timeout-minutes: 10  # Augmenter le délai d'attente à 10 minutes
 
       - name: List available AVDs
         run: |
           avdmanager list avd
-
+          ls -al $HOME/.android/avd  # Vérifiez les répertoires AVD
       - name: Start emulator
         run: |
           emulator -avd Pixel_5_API_34 -no-audio -no-window &
