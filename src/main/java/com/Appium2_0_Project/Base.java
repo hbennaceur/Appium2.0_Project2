@@ -53,22 +53,22 @@ public class Base {
                 .setUdid("emulator-5554")
                 .setAutomationName("UiAutomator2")
                 .setApp(appUrl);*/
-                des.setCapability(MobileCapabilityType.DEVICE_NAME, "pixel_5");
+                des.setCapability(MobileCapabilityType.DEVICE_NAME, "Pixel 5 API 34");
                 des.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
                 des.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
                 //des.setCapability("isHeadless",true);
                 des.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, "io.appium.android.apis");
                 des.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, "io.appium.android.apis.ApiDemos");
-                des.setCapability(AndroidMobileCapabilityType.AVD, "pixel_5");
+                des.setCapability(AndroidMobileCapabilityType.AVD, "Pixel_5_API_34");
                 des.setCapability(AndroidMobileCapabilityType.AVD_LAUNCH_TIMEOUT, 180000);
-                des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pin");
+                //des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pin");
                 // des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pattern");
-                des.setCapability(AndroidMobileCapabilityType.UNLOCK_KEY,"");
+                //des.setCapability(AndroidMobileCapabilityType.UNLOCK_KEY,"");
                 des.setCapability(MobileCapabilityType.APP,appUrl);
                 //  System.out.println("Session id" + driver.getSessionId());
                 // des.setCapability("noWindow", true); // Run in headless mode
                 // des.setCapability("disableWindowAnimation", true); // Disable animations for faster execution
-                driver=  new AndroidDriver(url, des);
+                driver=  new AndroidDriver(url,des);
             }
             case "IOS" -> {
                 des.setCapability(MobileCapabilityType.DEVICE_NAME, "Iphone 11");
