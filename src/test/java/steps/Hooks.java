@@ -16,8 +16,8 @@ public class Hooks extends Base {
     @After
     public void AfterAllMethode(Scenario sc){
         final byte[]
-                screenchot=((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
-        sc.attach(screenchot,"image/png","image");
+                screenshot=((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+        sc.attach(screenshot,"image/png","image");
         driver.quit();
     }
 
