@@ -53,7 +53,7 @@ public class Base {
                 .setUdid("emulator-5554")
                 .setAutomationName("UiAutomator2")
                 .setApp(appUrl);*/
-                des.setCapability(MobileCapabilityType.DEVICE_NAME, "Pixel 5 API 34");
+                des.setCapability(MobileCapabilityType.DEVICE_NAME, "Pixel_5_API_34");
                 des.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
                 des.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
                 //des.setCapability("isHeadless",true);
