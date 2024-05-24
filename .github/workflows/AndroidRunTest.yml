@@ -65,10 +65,6 @@ jobs:
           echo no | avdmanager create avd -n Pixel_5_API_34 -k "system-images;android-34;google_apis;x86_64" --force
         timeout-minutes: 10
 
-      # Ajoutez l'étape pour trouver le chemin de l'exécutable emulator ici
-      - name: Find emulator executable
-        run: |
-          where emulator
 
       - name: List available AVDs
         run: |
@@ -77,8 +73,8 @@ jobs:
 
       - name: Start emulator
         run: |
-          emulator -avd Pixel_5_API_34 -no-audio &
-          sleep 120
+          emulator -avd Pixel_5_API_34 -no-audio -no-window &
+          sleep 60
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
