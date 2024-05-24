@@ -73,7 +73,7 @@ jobs:
       - name: List available AVDs
         run: |
           avdmanager list avd
-          ls -al $HOME/.android/avd
+          dir $HOME\.android\avd
 
       - name: Start emulator
         run: |
