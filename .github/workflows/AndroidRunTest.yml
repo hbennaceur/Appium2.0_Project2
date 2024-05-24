@@ -16,7 +16,7 @@ jobs:
       - name: Find emulator executable
         run: |
           echo "Emulator executable path:"
-          which emulator
+          Get-Command emulator
 
       - name: Set up environment variables
         run: |
