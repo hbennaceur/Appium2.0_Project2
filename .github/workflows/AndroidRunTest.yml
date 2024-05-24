@@ -14,12 +14,14 @@ jobs:
 
       - name: Set up environment variables
         run: |
-          echo "Setting up environment variables"
-          export ANDROID_HOME=${{ env.ANDROID_SDK_ROOT }}
-          export PATH=$PATH:$ANDROID_HOME/tools
-          export PATH=$PATH:$ANDROID_HOME/platform-tools
-          echo "ANDROID_HOME is set to: $ANDROID_HOME"
-          echo "PATH is set to: $PATH"
+            echo "Setting up environment variables"
+            export ANDROID_HOME=$HOME/Library/Android/sdk
+            export PATH=$PATH:$ANDROID_HOME/emulator
+            export PATH=$PATH:$ANDROID_HOME/platform-tools
+            export PATH=$PATH:$ANDROID_HOME/tools
+            export PATH=$PATH:$ANDROID_HOME/tools/bin
+            echo "ANDROID_HOME is set to: $ANDROID_HOME"
+            echo "PATH is set to: $PATH"
         shell: bash
 
       - name: Set up JDK 17
