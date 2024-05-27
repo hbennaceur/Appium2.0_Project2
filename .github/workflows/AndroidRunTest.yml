@@ -92,7 +92,7 @@ jobs:
 
       - name: Start Appium server
         run: |
-          appium > appium.log 2>&1 &
+          appium &
           Start-Sleep -Seconds 20
         shell: pwsh
         env:
