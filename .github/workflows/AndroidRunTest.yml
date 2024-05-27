@@ -98,6 +98,10 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
+      - name: Display Appium Logs
+        run: |
+          type appium.log
+
       - name: Verify Appium server is running
         run: |
           curl http://127.0.0.1:4723/status
@@ -117,6 +121,4 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
-      - name: Display Appium Logs
-        run: |
-          type appium.log
+
