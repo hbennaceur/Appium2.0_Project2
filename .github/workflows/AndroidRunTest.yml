@@ -93,8 +93,7 @@ jobs:
       - name: Start Appium server
         run: |
           appium &
-          Start-Sleep -Seconds 20
-        shell: pwsh
+        shell: bash
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
