@@ -60,9 +60,12 @@ jobs:
           sdkmanager --install 'system-images;android-34;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
+        shell: bash
+
       - name: Accept SDK licenses
         run: |
           echo y | sdkmanager --licenses
+        shell: bash
 
       - name: Run Appium Doctor
         run: |
@@ -72,23 +75,27 @@ jobs:
       - name: Create AVD
         run: |
           echo no | avdmanager create avd -n Pixel_5_API_34 -k "system-images;android-34;google_apis;x86_64" --force
+        shell: bash
         timeout-minutes: 10
 
       - name: List available AVDs
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
+        shell: bash
 
       - name: Start emulator
         run: |
           emulator -avd Pixel_5_API_34 -no-audio -no-window &
           sleep 60
+        shell: bash
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Verify emulator is running
         run: |
           adb devices
+        shell: bash
 
       - name: Start Appium server
         run: |
@@ -113,6 +120,7 @@ jobs:
           echo "Running Maven tests..."
           mvn -Dtest=TestRunner test
           echo "Maven tests completed."
+        shell: pwsh
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
