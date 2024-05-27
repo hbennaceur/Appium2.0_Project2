@@ -82,9 +82,13 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd Pixel_5_API_34 -no-audio -no-window &
-          sleep 120
+          sleep 60
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
+      - name: Unlock ADB access on emulator
+        run: adb root && adb wait-for-device && adb remount
+        shell: bash
 
       - name: Verify emulator is running
         run: |
@@ -103,18 +107,6 @@ jobs:
           curl http://127.0.0.1:4723/status
           if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
         shell: pwsh
-
-      - name: Install APK using ADB
-        run: |
-          adb install -r ${{ github.workspace }}/src/main/resources/ApiDemos-debug.apk
-          if [ $? -eq 0 ]; then
-            echo "APK installation successful"
-          else
-            echo "APK installation failed"
-            exit 1
-          fi
-        shell: bash
-
 
       - name: Run Android Tests
         run: |
