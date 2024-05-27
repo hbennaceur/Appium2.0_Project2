@@ -40,7 +40,7 @@ jobs:
           npm install -g appium@2.5.1
           npm install -g appium-doctor
           appium -v
-          appium-doctor -v
+          appium-doctor --version
         shell: bash
 
       - name: Verify Appium environment with Appium Doctor
