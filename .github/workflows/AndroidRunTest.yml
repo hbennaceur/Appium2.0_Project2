@@ -12,7 +12,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-
       - name: Set up environment variables
         run: |
           echo "Setting up environment variables"
@@ -36,10 +35,17 @@ jobs:
         with:
           node-version: '16.13.0'
 
-      - name: Install Appium
+      - name: Install Appium and Appium Doctor
         run: |
           npm install -g appium@2.5.1
+          npm install -g appium-doctor
           appium -v
+          appium-doctor -v
+        shell: bash
+
+      - name: Verify Appium environment with Appium Doctor
+        run: |
+          appium-doctor --android
         shell: bash
 
       - name: Install UIAutomator2 driver for Appium
@@ -64,7 +70,6 @@ jobs:
         run: |
           echo no | avdmanager create avd -n Pixel_5_API_34 -k "system-images;android-34;google_apis;x86_64" --force
         timeout-minutes: 10
-
 
       - name: List available AVDs
         run: |
