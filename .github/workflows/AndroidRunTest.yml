@@ -34,7 +34,8 @@ jobs:
 
       - name: Display Android SDK installation path
         run: |
-          echo "Android SDK installed at: $ANDROID_SDK_ROOT"
+          echo "ANDROID_HOME: $ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
         shell: bash
 
       - name: Accept SDK licenses
