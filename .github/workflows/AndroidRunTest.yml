@@ -12,31 +12,39 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up environment variables
+        run: |
+          echo "Setting up environment variables"
+          export ANDROID_HOME=$HOME/Library/Android/sdk
+          export PATH=$PATH:$ANDROID_HOME/emulator
+          export PATH=$PATH:$ANDROID_HOME/platform-tools
+          export PATH=$PATH:$ANDROID_HOME/tools
+          export PATH=$PATH:$ANDROID_HOME/tools/bin
+          echo "ANDROID_HOME is set to: $ANDROID_HOME"
+          echo "PATH is set to: $PATH"
+        shell: bash
+
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Setup Android
-        uses: android-actions/setup-android@v2
-
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '16.13.0'
 
-      - name: Install Appium and Appium Doctor
+      - name: Install Appium
         run: |
           npm install -g appium@2.5.1
-          npm install -g appium-doctor
           appium -v
-          appium-doctor --version
         shell: bash
 
-      - name: Verify Appium environment with Appium Doctor
+      - name: Install Appium Doctor
         run: |
-          appium-doctor --android
+          npm install -g appium-doctor
+          appium-doctor --version
         shell: bash
 
       - name: Install UIAutomator2 driver for Appium
@@ -44,45 +52,71 @@ jobs:
           appium driver install uiautomator2@3.0.1
         shell: bash
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager --install 'system-images;android-34;google_apis;x86_64'
+          sdkmanager --install 'platform-tools'
+          sdkmanager --install 'emulator'
+      - name: Accept SDK licenses
+        run: |
+          echo y | sdkmanager --licenses
+
+      - name: Run Appium Doctor
+        run: |
+          appium-doctor --android
+        shell: bash
+
       - name: Create AVD
         run: |
           echo no | avdmanager create avd -n Pixel_5_API_34 -k "system-images;android-34;google_apis;x86_64" --force
         timeout-minutes: 10
-        shell: bash
 
       - name: List available AVDs
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
-        shell: bash
 
       - name: Start emulator
         run: |
           emulator -avd Pixel_5_API_34 -no-audio -no-window &
           sleep 60
-        shell: bash
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Verify emulator is running
         run: |
           adb devices
-        shell: bash
 
       - name: Start Appium server
         run: |
           appium &
         shell: bash
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Verify Appium server is running
         run: |
           curl http://127.0.0.1:4723/status
-        shell: bash
+          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
+        shell: pwsh
 
       - name: Run Android Tests
         run: |
+          echo "JAVA_HOME: $env:JAVA_HOME"
+          echo "ANDROID_HOME: $env:ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT: $env:ANDROID_SDK_ROOT"
+          Get-ChildItem
+          echo "Running Maven tests..."
           mvn -Dtest=TestRunner test
-        shell: bash
+          echo "Maven tests completed."
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Display Appium Logs
         run: |
           type appium.log
-        shell: bash
