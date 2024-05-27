@@ -12,17 +12,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up environment variables in PowerShell
+      - name: Set up environment variables
         run: |
           echo "Setting up environment variables"
-          $env:ANDROID_HOME = "C:\Android\android-sdk"
-          $env:ANDROID_SDK_ROOT = "C:\Android\android-sdk"
-          $env:PATH += ";$env:ANDROID_HOME\emulator"
-          $env:PATH += ";$env:ANDROID_HOME\platform-tools"
-          $env:PATH += ";$env:ANDROID_HOME\tools"
-          $env:PATH += ";$env:ANDROID_HOME\tools\bin"
+          $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
+          $env:PATH += ";${env:ANDROID_HOME}\emulator"
+          $env:PATH += ";${env:ANDROID_HOME}\platform-tools"
+          $env:PATH += ";${env:ANDROID_HOME}\tools"
+          $env:PATH += ";${env:ANDROID_HOME}\tools\bin"
           echo "ANDROID_HOME is set to: $env:ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT is set to: $env:ANDROID_SDK_ROOT"
           echo "PATH is set to: $env:PATH"
         shell: pwsh
 
@@ -62,19 +60,9 @@ jobs:
           sdkmanager --install 'system-images;android-34;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
-        shell: bash
-        env:
-          ANDROID_HOME: C:\Android\android-sdk
-          ANDROID_SDK_ROOT: C:\Android\android-sdk
-          PATH: ${{ env.PATH }};C:\Android\android-sdk\tools;C:\Android\android-sdk\tools\bin;C:\Android\android-sdk\platform-tools;C:\Android\android-sdk\emulator
-
       - name: Accept SDK licenses
         run: |
           echo y | sdkmanager --licenses
-        shell: bash
-        env:
-          ANDROID_HOME: C:\Android\android-sdk
-          ANDROID_SDK_ROOT: C:\Android\android-sdk
 
       - name: Run Appium Doctor
         run: |
@@ -84,35 +72,31 @@ jobs:
       - name: Create AVD
         run: |
           echo no | avdmanager create avd -n Pixel_5_API_34 -k "system-images;android-34;google_apis;x86_64" --force
-        shell: bash
         timeout-minutes: 10
 
       - name: List available AVDs
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
-        shell: bash
 
       - name: Start emulator
         run: |
           emulator -avd Pixel_5_API_34 -no-audio -no-window &
           sleep 60
-        shell: bash
         env:
-          ANDROID_SDK_ROOT: C:\Android\android-sdk
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Verify emulator is running
         run: |
           adb devices
-        shell: bash
 
       - name: Start Appium server
         run: |
           appium &
         shell: bash
         env:
-          ANDROID_HOME: C:\Android\android-sdk
-          ANDROID_SDK_ROOT: C:\Android\android-sdk
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Verify Appium server is running
         run: |
@@ -129,12 +113,9 @@ jobs:
           echo "Running Maven tests..."
           mvn -Dtest=TestRunner test
           echo "Maven tests completed."
-        shell: pwsh
         env:
-          JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.11-9\x64
-          ANDROID_HOME: C:\Android\android-sdk
-          ANDROID_SDK_ROOT: C:\Android\android-sdk
-          PATH: ${{ env.PATH }};C:\Android\android-sdk\tools;C:\Android\android-sdk\tools\bin;C:\Android\android-sdk\platform-tools;C:\Android\android-sdk\emulator
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Display Appium Logs
         run: |
