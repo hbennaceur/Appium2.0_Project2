@@ -12,15 +12,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up environment variables
+      - name: Set up environment variables in PowerShell
         run: |
           echo "Setting up environment variables"
-          $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
-          $env:PATH += ";${env:ANDROID_HOME}\emulator"
-          $env:PATH += ";${env:ANDROID_HOME}\platform-tools"
-          $env:PATH += ";${env:ANDROID_HOME}\tools"
-          $env:PATH += ";${env:ANDROID_HOME}\tools\bin"
+          $env:ANDROID_HOME = "C:\Android\android-sdk"
+          $env:ANDROID_SDK_ROOT = "C:\Android\android-sdk"
+          $env:PATH += ";$env:ANDROID_HOME\emulator"
+          $env:PATH += ";$env:ANDROID_HOME\platform-tools"
+          $env:PATH += ";$env:ANDROID_HOME\tools"
+          $env:PATH += ";$env:ANDROID_HOME\tools\bin"
           echo "ANDROID_HOME is set to: $env:ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT is set to: $env:ANDROID_SDK_ROOT"
           echo "PATH is set to: $env:PATH"
         shell: pwsh
 
@@ -61,11 +63,18 @@ jobs:
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
         shell: bash
+        env:
+          ANDROID_HOME: C:\Android\android-sdk
+          ANDROID_SDK_ROOT: C:\Android\android-sdk
+          PATH: ${{ env.PATH }};C:\Android\android-sdk\tools;C:\Android\android-sdk\tools\bin;C:\Android\android-sdk\platform-tools;C:\Android\android-sdk\emulator
 
       - name: Accept SDK licenses
         run: |
           echo y | sdkmanager --licenses
         shell: bash
+        env:
+          ANDROID_HOME: C:\Android\android-sdk
+          ANDROID_SDK_ROOT: C:\Android\android-sdk
 
       - name: Run Appium Doctor
         run: |
@@ -90,7 +99,7 @@ jobs:
           sleep 60
         shell: bash
         env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          ANDROID_SDK_ROOT: C:\Android\android-sdk
 
       - name: Verify emulator is running
         run: |
@@ -102,8 +111,8 @@ jobs:
           appium &
         shell: bash
         env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          ANDROID_HOME: C:\Android\android-sdk
+          ANDROID_SDK_ROOT: C:\Android\android-sdk
 
       - name: Verify Appium server is running
         run: |
@@ -122,8 +131,10 @@ jobs:
           echo "Maven tests completed."
         shell: pwsh
         env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.11-9\x64
+          ANDROID_HOME: C:\Android\android-sdk
+          ANDROID_SDK_ROOT: C:\Android\android-sdk
+          PATH: ${{ env.PATH }};C:\Android\android-sdk\tools;C:\Android\android-sdk\tools\bin;C:\Android\android-sdk\platform-tools;C:\Android\android-sdk\emulator
 
       - name: Display Appium Logs
         run: |
