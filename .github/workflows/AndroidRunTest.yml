@@ -23,14 +23,14 @@ jobs:
 
       - name: Install Android SDK packages
         run: |
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install 'system-images;android-34;google_apis;x86_64'
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install 'platform-tools'
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install 'cmdline-tools;latest'
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install 'system-images;android-34;google_apis;x86_64'
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install 'platform-tools'
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install 'cmdline-tools;latest'
         shell: bash
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
       - name: Display Android SDK installation path
         run: |
@@ -39,7 +39,7 @@ jobs:
 
       - name: Accept SDK licenses
         run: |
-          echo y | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+          echo y | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
         shell: bash
 
       - name: Set up environment variables
