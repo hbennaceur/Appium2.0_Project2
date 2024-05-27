@@ -62,6 +62,11 @@ jobs:
           sdkmanager --install 'cmdline-tools;latest'
         shell: bash
 
+      - name: Display Android SDK installation path
+        run: |
+            echo "Android SDK installed at: $ANDROID_SDK_ROOT"
+        shell: bash
+
       - name: Accept SDK licenses
         run: |
           echo y | sdkmanager --licenses
