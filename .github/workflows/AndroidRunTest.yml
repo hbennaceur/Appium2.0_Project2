@@ -104,6 +104,18 @@ jobs:
           if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
         shell: pwsh
 
+      - name: Install APK using ADB
+        run: |
+          adb install -r ${{ github.workspace }}/src/main/resources/ApiDemos-debug.apk
+          if [ $? -eq 0 ]; then
+            echo "APK installation successful"
+          else
+            echo "APK installation failed"
+            exit 1
+          fi
+        shell: bash
+
+
       - name: Run Android Tests
         run: |
           echo "JAVA_HOME: $env:JAVA_HOME"
