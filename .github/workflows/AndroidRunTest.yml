@@ -90,9 +90,6 @@ jobs:
         run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
         shell: bash
 
-      - name: Unlock ADB access on emulator
-        run: adb root && adb wait-for-device && adb remount
-        shell: bash
 
       - name: Verify emulator is running
         run: |
