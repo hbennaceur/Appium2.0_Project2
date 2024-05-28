@@ -82,7 +82,7 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd Pixel_5_API_34 -no-audio -no-window &
-          sleep 300
+          sleep 350
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
