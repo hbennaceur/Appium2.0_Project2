@@ -53,13 +53,13 @@ public class Base {
                 .setUdid("emulator-5554")
                 .setAutomationName("UiAutomator2")
                 .setApp(appUrl);*/
-                des.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
+                des.setCapability(MobileCapabilityType.DEVICE_NAME, "Pixel_5_API_34");
                 des.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
                 des.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
                 //des.setCapability("isHeadless",true);
                 des.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, "io.appium.android.apis");
                 des.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, "io.appium.android.apis.ApiDemos");
-                des.setCapability(AndroidMobileCapabilityType.AVD, "emulator-5554");
+                des.setCapability(AndroidMobileCapabilityType.AVD, "Pixel_5_API_34");
                 des.setCapability(AndroidMobileCapabilityType.AVD_LAUNCH_TIMEOUT, 180000);
                 //des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pin");
                 // des.setCapability(AndroidMobileCapabilityType.UNLOCK_TYPE,"pattern");
@@ -80,4 +80,4 @@ public class Base {
             default -> throw new Exception("Invalid platform");
         }
     }}
-///
+//
