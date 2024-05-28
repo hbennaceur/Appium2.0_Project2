@@ -82,13 +82,10 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd Pixel_5_API_34 -no-audio -no-window &
-          sleep 60
+          sleep 300
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
-      - name: Wait for emulator to boot
-        run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-        shell: bash
 
 
       - name: Verify emulator is running
