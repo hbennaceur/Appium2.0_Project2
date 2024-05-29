@@ -37,7 +37,7 @@ jobs:
 
       - name: Install Appium
         run: |
-          npm install -g appium@2.5.1
+          npm install -g appium@latest
           appium -v
         shell: bash
 
@@ -113,7 +113,7 @@ jobs:
           echo "ANDROID_SDK_ROOT: $env:ANDROID_SDK_ROOT"
           Get-ChildItem
           echo "Running Maven tests..."
-          mvn -Dtest=TestRunner test
+          mvn test -Denv=local
           echo "Maven tests completed."
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
