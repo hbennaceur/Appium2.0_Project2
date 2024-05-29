@@ -9,7 +9,7 @@ import io.cucumber.java.en.When;
 public class runAppSteps extends Base {
     @Given("User run application")
     public void user_run_application() throws Exception {
-        InitializeDriver("Android");
+        InitializeDriver(props.getProperty("platformName"));
 
     }
 

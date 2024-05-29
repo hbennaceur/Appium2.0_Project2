@@ -11,38 +11,23 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <platform>Android</platform> <!-- Default platform -->
     </properties>
 
     <profiles>
         <profile>
             <id>Android</id>
             <properties>
-                <platform>Android</platform>
+                <platformName>Android</platformName>
             </properties>
         </profile>
         <profile>
             <id>IOS</id>
             <properties>
-                <platform>IOS</platform>
+                <platformName>IOS</platformName>
             </properties>
         </profile>
     </profiles>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
-                <configuration>
-                    <systemPropertyVariables>
-                        <env>${platform}</env> <!-- Ensure the platform property is passed to the tests -->
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>
