@@ -4,6 +4,7 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
@@ -67,12 +68,12 @@ public class Base {
 
 
             case "IOS":
-                 DesiredCapabilities des = new DesiredCapabilities();
-                des.setCapability("deviceName", "Iphone 11");
-                des.setCapability("platformName", "iOS");
-                des.setCapability("automationName", "XCUITest");
-                des.setCapability("bundleId", "com.example.apple-samplecode.UICatalog");
-                driver = new IOSDriver(url, des);
+                XCUITestOptions option =new XCUITestOptions();
+                option.setDeviceName("iPhone 13");
+                option.setPlatformName("iOS");
+                option.setAutomationName("XCUITest");
+                option.setBundleId("com.example.apple-samplecode.UICatalog");
+                driver = new IOSDriver(url, option);
                 break;
             default:
                 throw new Exception("Invalid platform");
