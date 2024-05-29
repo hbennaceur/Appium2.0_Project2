@@ -13,12 +13,30 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>Android</id>
+            <properties>
+                <platform>Android</platform>
+            </properties>
+        </profile>
+
+
+    <profile>
+        <id>IOS</id>
+        <properties>
+            <platform>IOS</platform>
+        </properties>
+    </profile>
+</profiles>
+
     <dependencies>
         <!-- https://mvnrepository.com/artifact/io.appium/java-client -->
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
-            <version>8.6.0</version>
+            <version>9.2.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->

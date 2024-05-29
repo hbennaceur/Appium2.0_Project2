@@ -63,16 +63,17 @@ public class Base {
 
                 driver = new AndroidDriver(url, options);
                 System.out.println("Session id: " + driver.getSessionId());
+                break;
 
 
             case "IOS":
-                DesiredCapabilities des = new DesiredCapabilities();
+                 DesiredCapabilities des = new DesiredCapabilities();
                 des.setCapability("deviceName", "Iphone 11");
                 des.setCapability("platformName", "iOS");
                 des.setCapability("automationName", "XCUITest");
                 des.setCapability("bundleId", "com.example.apple-samplecode.UICatalog");
                 driver = new IOSDriver(url, des);
-
+                break;
             default:
                 throw new Exception("Invalid platform");
         }
