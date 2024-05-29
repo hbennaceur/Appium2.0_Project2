@@ -4,7 +4,6 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
@@ -44,7 +43,7 @@ public class Base {
         String appUrl = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "ApiDemos-debug.apk").toString();
 
         switch (platformName) {
-            case "Android" -> {
+            case "Android":
                 UiAutomator2Options options = new UiAutomator2Options()
                         .setDeviceName("Pixel_5_API_34")
                         .setUdid("emulator-5554")
@@ -64,17 +63,18 @@ public class Base {
 
                 driver = new AndroidDriver(url, options);
                 System.out.println("Session id: " + driver.getSessionId());
-            }
-            case "IOS" -> {
 
+
+            case "IOS":
                 DesiredCapabilities des = new DesiredCapabilities();
-                des.setCapability(MobileCapabilityType.DEVICE_NAME, "Iphone 11");
-                des.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
-                des.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
+                des.setCapability("deviceName", "Iphone 11");
+                des.setCapability("platformName", "iOS");
+                des.setCapability("automationName", "XCUITest");
                 des.setCapability("bundleId", "com.example.apple-samplecode.UICatalog");
                 driver = new IOSDriver(url, des);
-            }
-            default -> throw new Exception("Invalid platform");
+
+            default:
+                throw new Exception("Invalid platform");
         }
     }
 }
