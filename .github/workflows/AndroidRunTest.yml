@@ -46,9 +46,14 @@ jobs:
       - name: Accept SDK licenses
         run: yes | sdkmanager --licenses
 
+      - name: Install system image
+        run: sdkmanager "system-images;android-34;google_apis;x86_64"
+
       - name: Create AVD
-        run: |
-          echo no | avdmanager create avd -n test -k "system-images;android-34;google_apis;x86_64" --force
+        run: echo no | avdmanager create avd -n test -k "system-images;android-34;google_apis;x86_64" --force
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Start emulator
         run: |
@@ -59,12 +64,10 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
       - name: Verify emulator is running
-        run: |
-          adb devices
+        run: adb devices
 
       - name: Run Appium Doctor
-        run: |
-          appium-doctor --android
+        run: appium-doctor --android
 
       - name: Start Appium server
         run: |
@@ -72,8 +75,7 @@ jobs:
           sleep 10  # Wait for the Appium server to start
 
       - name: Verify Appium server is running
-        run: |
-          curl http://127.0.0.1:4723/status
+        run: curl http://127.0.0.1:4723/status
 
       - name: Run Android Tests
         run: |
