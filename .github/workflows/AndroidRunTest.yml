@@ -64,7 +64,7 @@ jobs:
         run: |
           if ! sdkmanager --list | grep -q "system-images;android-34;google_apis;x86_64"; then
             echo "Installing system image..."
-            sdkmanager "system-images;android-34;google_apis;x86_64"
+            yes | sdkmanager "system-images;android-34;google_apis;x86_64"
           fi
 
       # Create AVD
