@@ -13,12 +13,12 @@ public class Hooks extends Base {
         System.out.println("**** STARTING TEST ****");
     }
 
-   /* @After
+    @After
     public void AfterAllMethode(Scenario sc){
         final byte[]
                 screenshot=((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
         sc.attach(screenshot,"image/png","image");
         driver.quit();
-    }*/
+    }
 
 }
