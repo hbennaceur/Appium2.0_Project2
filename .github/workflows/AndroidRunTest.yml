@@ -17,6 +17,7 @@ jobs:
         run: |
           sudo usermod -aG kvm $USER
           echo "KVM permissions configured."
+          groups $USER  # Verify that the user is in the kvm group
 
       # Set up JDK 17
       - name: Set up JDK 17
