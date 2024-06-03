@@ -16,7 +16,6 @@ jobs:
       - name: Configure KVM permissions
         run: |
           sudo usermod -aG kvm $USER
-          echo "KVM permissions configured."
           groups $USER  # Verify that the user is in the kvm group
 
       # Set up JDK 17
@@ -60,10 +59,6 @@ jobs:
       - name: Accept SDK licenses
         run: yes | sdkmanager --licenses
 
-      # Install system image
-      - name: Install system image
-        run: sdkmanager "system-images;android-34;google_apis;x86_64"
-
       # Create AVD
       - name: Create AVD
         run: echo no | avdmanager create avd -n test -k "system-images;android-34;google_apis;x86_64" --force
@@ -74,7 +69,7 @@ jobs:
       # Start emulator
       - name: Start emulator
         run: |
-          $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio &
+          $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio -no-snapshot -no-accel -gpu off &
           adb wait-for-device
           adb shell input keyevent 82
         env:
