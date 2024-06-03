@@ -38,47 +38,36 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          check-latest: true
-
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Enable KVM group perms
+      - name: Install Java
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
+          sudo apt update
+          sudo apt install openjdk-17-jdk -y
+          sudo update-java-alternatives --set java-17-openjdk-amd64
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        run: |
+          ANDROID_HOME=/opt/androidsdk
+          mkdir -p $ANDROID_HOME
+          cd ~ && wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
+          sudo apt install unzip -y && unzip sdk-tools-linux-4333796.zip -d $ANDROID_HOME
+          echo "export ANDROID_HOME=$ANDROID_HOME" >> ~/.bashrc
+          echo 'export SDK=$ANDROID_HOME' >> ~/.bashrc
+          echo 'export PATH=$SDK/emulator:$SDK/tools:$SDK/tools/bin:$SDK/platform-tools:$PATH' >> ~/.bashrc
+          source ~/.bashrc
+          yes | $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms;android-${{ matrix.apiLevel }}" "emulator"
+          yes | $ANDROID_HOME/tools/bin/sdkmanager "system-images;android-${{ matrix.apiLevel }};google_apis;x86_64"
+          emulator -version
 
-      - name: AVD cache
-        uses: actions/cache@v3
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.apiLevel }}
+      - name: Create and Start Emulator
+        run: |
+          avd_name="Pixel_5_API_34"
+          echo no | $ANDROID_HOME/tools/bin/avdmanager create avd -n $avd_name -k "system-images;android-${{ matrix.apiLevel }};google_apis;x86_64"
+          $ANDROID_HOME/emulator/emulator -avd $avd_name -no-audio -no-window -no-accel &
 
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          avd-name: ${{ env.ANDROID_AVD }}
-          force-avd-creation: false
-          api-level: ${{ matrix.apiLevel }}
-          disable-spellchecker: true
-          target: ${{ matrix.emuTag }}
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          arch: ${{ matrix.arch }}
-          disable-animations: true
-          script: echo "Generated AVD snapshot for caching."
+      - name: Wait for Emulator to Start
+        run: |
+          adb wait-for-device
+          adb shell input keyevent 82
 
       - run: nohup adb logcat > logcat.log &
         name: Capture logcat
