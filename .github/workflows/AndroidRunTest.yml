@@ -53,11 +53,19 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           api-levels: 34
-          components: platform-tools, emulator, system-images;android-34;google_apis;x86_64
+          components: platform-tools, emulator
 
       # Accept SDK licenses
       - name: Accept SDK licenses
         run: yes | sdkmanager --licenses
+
+      # Check and install system image
+      - name: Check and install system image
+        run: |
+          if ! sdkmanager --list | grep -q "system-images;android-34;google_apis;x86_64"; then
+            echo "Installing system image..."
+            sdkmanager "system-images;android-34;google_apis;x86_64"
+          fi
 
       # Create AVD
       - name: Create AVD
