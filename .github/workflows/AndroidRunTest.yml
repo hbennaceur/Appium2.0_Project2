@@ -39,13 +39,12 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          api-levels: 34
+          components: platform-tools, emulator, system-images;android-34;google_apis;x86_64
 
-      - name: Install Android SDK packages
-        run: |
-          sdkmanager --install 'system-images;android-34;google_apis;x86_64'
-          sdkmanager --install 'platform-tools'
-          sdkmanager --install 'emulator'
-          yes | sdkmanager --licenses
+      - name: Accept SDK licenses
+        run: yes | sdkmanager --licenses
 
       - name: Create AVD
         run: |
@@ -53,9 +52,11 @@ jobs:
 
       - name: Start emulator
         run: |
-          emulator -avd test -no-window -no-audio &
+          $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio &
           adb wait-for-device
           adb shell input keyevent 82
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
       - name: Verify emulator is running
         run: |
@@ -82,3 +83,6 @@ jobs:
           echo "Running Maven tests..."
           mvn test -Denv=local
           echo "Maven tests completed."
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
