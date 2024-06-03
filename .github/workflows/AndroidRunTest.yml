@@ -66,6 +66,7 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
+
       # Start emulator
       - name: Start emulator
         run: |
