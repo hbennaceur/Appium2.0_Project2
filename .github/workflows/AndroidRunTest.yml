@@ -3,7 +3,10 @@ name: Android Tests
 on:
   push:
     branches:
-      - master
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -37,10 +40,13 @@ jobs:
           target: default
           arch: x86_64
 
+      - name: Install Android Command Line Tools
+        run: sdkmanager --install "cmdline-tools;latest"
+
       - name: Accept Android SDK licenses
         run: |
-          $sdkManager = "${ANDROID_SDK_ROOT}\cmdline-tools\latest\bin\sdkmanager.bat"
-          Start-Process -Wait -NoNewWindow -FilePath $sdkManager -ArgumentList "--licenses" -PassThru | ForEach-Object { $_.StandardInput.WriteLine("y") }
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          yes | sdkmanager --licenses
 
       - name: Install dependencies
         run: mvn install
