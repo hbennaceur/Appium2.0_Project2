@@ -3,7 +3,7 @@ name: Android Instrumented Tests
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
       - main
