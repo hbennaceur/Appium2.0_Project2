@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest  # Utilisez une machine Linux pour une meilleure compatibilité avec les outils Android
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -65,6 +65,7 @@ jobs:
           adb shell input keyevent 82
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_AVD_HOME: /home/runner/.config/.android/avd
 
       - name: Verify emulator is running
         run: adb devices
