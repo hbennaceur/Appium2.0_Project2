@@ -41,7 +41,9 @@ jobs:
           arch: x86_64
 
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+        run: |
+          $sdkManager = "${ANDROID_SDK_ROOT}\cmdline-tools\latest\bin\sdkmanager.bat"
+          Start-Process -Wait -NoNewWindow -FilePath $sdkManager -ArgumentList "--licenses" -PassThru | ForEach-Object { $_.StandardInput.WriteLine("y") }
 
       - name: Install dependencies
         run: mvn install
