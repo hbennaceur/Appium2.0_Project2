@@ -1,4 +1,3 @@
-
 name: Run Android tests in GitHub Runner
 
 on:
@@ -81,11 +80,10 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd Nexus_6_API_30 -no-audio -no-window &
-          sleep 60
+          adb wait-for-device
+          sleep 120
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-
-
 
       - name: Verify emulator is running
         run: |
