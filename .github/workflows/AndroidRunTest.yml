@@ -3,53 +3,41 @@ name: Android Tests
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
       - main
 
 jobs:
-  build:
-    runs-on: windows-latest
+  test:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
+      - name: Configurer Java 17
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'adoptium'
 
-      - name: Install Node.js
+      - name: Installer Node.js 16.13.0
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '16.13.0'
 
-      - name: Install Appium
-        run: npm install -g appium
-
-      - name: Start Appium server
-        run: appium &
-
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v2
-        with:
-          api-levels: 30
-          target: default
-          arch: x86_64
-
-      - name: Install Android Command Line Tools
-        run: sdkmanager --install "cmdline-tools;latest"
-
-      - name: Accept Android SDK licenses
+      - name: Installer Android SDK
         run: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-          yes | sdkmanager --licenses
+          sudo apt-get update && sudo apt-get install -y android-studio
 
-      - name: Install dependencies
+      - name: Démarrer l'émulateur Android
+        run: |
+          adb devices
+          adb shell input keyevent 82
+
+      - name: Installer les dépendances Maven
         run: mvn install
 
-      - name: Run tests
-        run: mvn test -PAndroid
+      - name: Exécuter les tests Appium
+        run: mvn test
