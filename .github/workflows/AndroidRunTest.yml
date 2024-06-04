@@ -15,14 +15,10 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "Setting up environment variables"
-          $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
-          $env:PATH += ";${env:ANDROID_HOME}\emulator"
-          $env:PATH += ";${env:ANDROID_HOME}\platform-tools"
-          $env:PATH += ";${env:ANDROID_HOME}\tools"
-          $env:PATH += ";${env:ANDROID_HOME}\tools\bin"
-          echo "ANDROID_HOME is set to: $env:ANDROID_HOME"
-          echo "PATH is set to: $env:PATH"
-        shell: pwsh
+          echo "ANDROID_HOME=C:/Android/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=C:/Android/android-sdk" >> $GITHUB_ENV
+          echo "PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin" >> $GITHUB_ENV
+        shell: bash
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
@@ -60,9 +56,11 @@ jobs:
           sdkmanager --install 'system-images;android-30;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
+
       - name: Accept SDK licenses
         run: |
           echo y | sdkmanager --licenses
+
       - name: Run Appium Doctor
         run: |
           appium-doctor --android
@@ -77,6 +75,13 @@ jobs:
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
+
+      - name: Verify PATH
+        run: |
+          echo $PATH
+          which emulator
+          which adb
+        shell: bash
 
       - name: Start emulator
         run: |
@@ -101,10 +106,10 @@ jobs:
             echo "Emulator failed to boot in time."
             exit 1
           fi
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
         shell: bash
-
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Verify emulator is running
         run: |
