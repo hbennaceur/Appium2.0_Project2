@@ -77,17 +77,22 @@ jobs:
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
+
       - name: Start emulator
         run: |
-          emulator -avd Nexus_6_API_30 -no-audio -no-window &
+          emulator -avd Nexus_6_API_30 -no-audio -no-window -gpu swiftshader_indirect &
           adb wait-for-device
-          sleep 120
+          sleep 180
+          adb shell input keyevent 82
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Verify emulator is running
         run: |
           adb devices
+          adb shell getprop init.svc.bootanim | grep -m 1 stopped
+        shell: bash
+
       - name: Start Appium server
         run: |
           appium &
