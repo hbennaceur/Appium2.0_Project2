@@ -84,8 +84,27 @@ jobs:
           adb wait-for-device
           sleep 180
           adb shell input keyevent 82
+          boot_completed=false
+          retry_count=0
+          max_retries=10
+          until [ "$boot_completed" = "1" ] || [ "$retry_count" -ge "$max_retries" ]; do
+            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null)
+            if [ "$boot_completed" = "1" ]; then
+              echo "Emulator boot completed."
+              break
+            fi
+            echo "Waiting for emulator to boot..."
+            sleep 20
+            retry_count=$((retry_count + 1))
+          done
+          if [ "$boot_completed" != "1" ]; then
+            echo "Emulator failed to boot in time."
+            exit 1
+          fi
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+        shell: bash
+
 
       - name: Verify emulator is running
         run: |
