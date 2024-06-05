@@ -72,7 +72,7 @@ jobs:
 
       - name: Create AVD
         run: |
-          echo no | avdmanager create avd -n Nexus_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
+          echo no | avdmanager create avd -n Nexus 6 API 30 -k "system-images;android-30;google_apis;x86_64" --force
         timeout-minutes: 10
 
       - name: List available AVDs
@@ -89,8 +89,8 @@ jobs:
           }
           $emulatorProcess = Get-Process emulator -ErrorAction SilentlyContinue
           if (-not $emulatorProcess) {
-            Start-Process -FilePath $emulatorPath -ArgumentList "-avd Nexus_6_API_30 -no-audio -no-window"
-            Start-Sleep -Seconds 60
+            Start-Process -FilePath $emulatorPath -ArgumentList "-avd NNexus 6 API 30 -no-audio -no-window"
+            Start-Sleep -Seconds 120
           } else {
             Write-Output "Emulator is already running."
           }
