@@ -52,7 +52,6 @@ public class Base {
                         .setApp(appUrl)
                         .setAppPackage("io.appium.android.apis")
                         .setAppActivity("io.appium.android.apis.ApiDemos")
-                        .setAvd("Nexus_6_API_30")
                         .setAvdLaunchTimeout(Duration.ofMinutes(3)) // Set a reasonable timeout
                         .setUnlockType("pin")
                         .setUnlockKey("")
