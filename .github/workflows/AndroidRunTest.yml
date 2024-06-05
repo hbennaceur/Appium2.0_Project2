@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: windows-latest
     strategy:
       matrix:
         api-level: [30]
@@ -29,8 +29,6 @@ jobs:
           node-version: '16.13.0'
           architecture: 'x64'
           check-latest: false
-        env:
-          JAVA_HOME: /Users/runner/hostedtoolcache/Java_Adopt_jdk/17.0.11-9/x64/Contents/Home
 
       - name: Install Appium
         run: |
@@ -38,14 +36,9 @@ jobs:
           appium -v
           appium &>/dev/null &
 
-      - name: Set up Android SDK environment
-        run: |
-          export ANDROID_HOME=${{ runner.tool_cache }}/Android/sdk
-          export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
-
       - name: Install Android SDK packages
         run: |
-          $ANDROID_HOME/tools/bin/sdkmanager --install 'build-tools;29.0.2' 'platform-tools' 'platforms;android-30' 'emulator'
+          sdkmanager --install 'build-tools;29.0.2' 'platform-tools' 'platforms;android-30' 'emulator'
 
       - name: Run Appium Tests
         uses: reactivecircus/android-emulator-runner@v1
