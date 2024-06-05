@@ -82,9 +82,14 @@ jobs:
 
       - name: Start emulator
         run: |
+          $emulatorPath = "${env:ANDROID_HOME}\emulator\emulator.exe"
+          if (-not (Test-Path $emulatorPath)) {
+            Write-Error "Emulator not found at path: $emulatorPath"
+            exit 1
+          }
           $emulatorProcess = Get-Process emulator -ErrorAction SilentlyContinue
           if (-not $emulatorProcess) {
-            emulator -avd Nexus_6_API_30 -no-audio -no-window
+            Start-Process -FilePath $emulatorPath -ArgumentList "-avd Nexus_6_API_30 -no-audio -no-window"
             Start-Sleep -Seconds 60
           } else {
             Write-Output "Emulator is already running."
@@ -94,8 +99,6 @@ jobs:
           JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.11-9\x64
           ANDROID_HOME: C:\Android\android-sdk
           ANDROID_SDK_ROOT: C:\Android\android-sdk
-
-
 
       - name: Start Appium server
         run: |
