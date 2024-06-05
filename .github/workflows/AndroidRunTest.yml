@@ -79,6 +79,7 @@ jobs:
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
+
       - name: Start emulator
         run: |
           if [ -z "$(pgrep -f 'emulator')" ]; then
@@ -87,8 +88,12 @@ jobs:
           else
             echo "Emulator is already running."
           fi
+        shell: pwsh
         env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.11-9\x64
+          ANDROID_HOME: C:\Android\android-sdk
+          ANDROID_SDK_ROOT: C:\Android\android-sdk
+
 
       - name: Start Appium server
         run: |
