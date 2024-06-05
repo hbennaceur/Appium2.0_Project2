@@ -17,13 +17,14 @@ jobs:
         run: |
           echo "Setting up environment variables"
           $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
-          $env:PATH += ";${env:ANDROID_HOME}\emulator"
-          $env:PATH += ";${env:ANDROID_HOME}\platform-tools"
-          $env:PATH += ";${env:ANDROID_HOME}\tools"
-          $env:PATH += ";${env:ANDROID_HOME}\tools\bin"
+          $env:PATH += ";${env:ANDROID_HOME}\\emulator"
+          $env:PATH += ";${env:ANDROID_HOME}\\platform-tools"
+          $env:PATH += ";${env:ANDROID_HOME}\\tools"
+          $env:PATH += ";${env:ANDROID_HOME}\\tools\\bin"
           echo "ANDROID_HOME is set to: $env:ANDROID_HOME"
           echo "PATH is set to: $env:PATH"
         shell: pwsh
+
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
