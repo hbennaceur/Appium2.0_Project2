@@ -81,8 +81,12 @@ jobs:
           dir $HOME\.android\avd
       - name: Start emulator
         run: |
-          emulator -avd Nexus_6_API_30 -no-audio -no-window &
-          sleep 180
+          if [ -z "$(pgrep -f 'emulator')" ]; then
+            emulator -avd Nexus_6_API_30 -no-audio -no-window &
+            sleep 180
+          else
+            echo "Emulator is already running."
+          fi
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
