@@ -38,22 +38,14 @@ jobs:
           appium -v
           appium &>/dev/null &
 
+      - name: Set up Android SDK environment
+        run: |
+          export ANDROID_HOME=/path/to/android-sdk
+          export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
+
       - name: Install Android SDK packages
         run: |
           sdkmanager --install 'build-tools;29.0.2' 'platform-tools' 'platforms;android-30' 'emulator'
-
-      - name: Accept SDK licenses
-        run: |
-          yes | sdkmanager --licenses
-
-      - name: Create and start emulator
-        run: |
-          echo no | avdmanager create avd -n Nexus_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
-          emulator -avd Nexus_6_API_30 -no-audio -no-window &
-          sleep 30
-
-      - name: Verify emulator is running
-        run: adb devices
 
       - name: Run Appium Tests
         uses: reactivecircus/android-emulator-runner@v1
@@ -61,4 +53,5 @@ jobs:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
           arch: x86_64
+          profile: Nexus 6 API 30
           script: mvn clean test -Pandroid
