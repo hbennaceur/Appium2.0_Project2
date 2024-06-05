@@ -40,12 +40,12 @@ jobs:
 
       - name: Set up Android SDK environment
         run: |
-          export ANDROID_HOME=$RUNNER_TOOL_CACHE/Android/sdk
+          export ANDROID_HOME=${{ runner.tool_cache }}/Android/sdk
           export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager --install 'build-tools;29.0.2' 'platform-tools' 'platforms;android-30' 'emulator'
+          $ANDROID_HOME/tools/bin/sdkmanager --install 'build-tools;29.0.2' 'platform-tools' 'platforms;android-30' 'emulator'
 
       - name: Run Appium Tests
         uses: reactivecircus/android-emulator-runner@v1
