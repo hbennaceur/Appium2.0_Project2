@@ -83,7 +83,7 @@ jobs:
           dir $HOME\.android\avd
       - name: Start emulator
         run: |
-          emulator -avd Nexus_6_API_30 -no-audio -no-window &
+          emulator -avd Nexus_6_API_30 &
           sleep 180
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}

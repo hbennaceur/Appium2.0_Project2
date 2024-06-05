@@ -59,8 +59,8 @@ public class Base {
                         .setNewCommandTimeout(Duration.ofSeconds(300)); // Set new command timeout
 
                 // Adding unsupported capabilities directly
-                options.setCapability("noWindow", true); // Run in headless mode
-                options.setCapability("disableWindowAnimation", true); // Disable window animation
+               // options.setCapability("noWindow", true); // Run in headless mode
+               // options.setCapability("disableWindowAnimation", true); // Disable window animation
 
                 driver = new AndroidDriver(url, options);
                 System.out.println("Session id: " + driver.getSessionId());
