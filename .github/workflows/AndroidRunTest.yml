@@ -40,7 +40,7 @@ jobs:
 
       - name: Set up Android SDK environment
         run: |
-          export ANDROID_HOME=/path/to/android-sdk
+          export ANDROID_HOME=$RUNNER_TOOL_CACHE/Android/sdk
           export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
 
       - name: Install Android SDK packages
