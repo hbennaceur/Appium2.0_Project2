@@ -17,11 +17,13 @@ jobs:
         run: |
           echo "Setting up environment variables"
           $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
+          $env:ANDROID_SDK_ROOT = $env:ANDROID_HOME
           $env:PATH += ";${env:ANDROID_HOME}\\emulator"
           $env:PATH += ";${env:ANDROID_HOME}\\platform-tools"
           $env:PATH += ";${env:ANDROID_HOME}\\tools"
           $env:PATH += ";${env:ANDROID_HOME}\\tools\\bin"
           echo "ANDROID_HOME is set to: $env:ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT is set to: $env:ANDROID_SDK_ROOT"
           echo "PATH is set to: $env:PATH"
         shell: pwsh
 
@@ -82,7 +84,7 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd Nexus_6_API_30 -no-audio -no-window &
-          sleep 60
+          sleep 180
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
