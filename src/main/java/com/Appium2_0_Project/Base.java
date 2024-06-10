@@ -46,12 +46,13 @@ public class Base {
         switch (platformName) {
             case "Android":
                 UiAutomator2Options options = new UiAutomator2Options()
-                        .setDeviceName("Nexus 6")
+                        .setDeviceName("Pixel 6 API 30")
                         .setUdid("emulator-5554")
                         .setAutomationName("UiAutomator2")
                         .setApp(appUrl)
                         .setAppPackage("io.appium.android.apis")
                         .setAppActivity("io.appium.android.apis.ApiDemos")
+                        .setAvd("Pixel_6_API_30")
                         .setAvdLaunchTimeout(Duration.ofMinutes(3)) // Set a reasonable timeout
                         .setUnlockType("pin")
                         .setUnlockKey("")
