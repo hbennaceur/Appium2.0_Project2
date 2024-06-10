@@ -25,6 +25,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
+          distribution: 'temurin'
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -41,9 +42,50 @@ jobs:
           sdkmanager --install 'system-images;android-30;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
+
       - name: Accept SDK licenses
         run: |
-          echo y | sdkmanager --licenses
+          yes | sdkmanager --licenses
+
+      - name: Run Appium Doctor
+        run: |
+          appium-doctor --android
+
+      - name: Create AVD
+        run: |
+          echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
+        timeout-minutes: 10
+
+      - name: List available AVDs
+        run: |
+          avdmanager list avd
+          dir $HOME/.android/avd
+
+      - name: Start Appium server
+        run: |
+          appium &
+        shell: bash
+
+      - name: Verify Appium server is running
+        run: |
+          curl http://127.0.0.1:4723/status
+          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
+        shell: pwsh
+
+      - name: Start emulator
+        run: |
+          $ANDROID_SDK_ROOT/emulator/emulator -avd Pixel_6_API_30 -no-audio -no-window &
+          sleep 60
+        shell: pwsh
+        env:
+          JAVA_HOME: /usr/lib/jvm/adoptopenjdk-17-hotspot-amd64
+          ANDROID_HOME: /usr/local/android-sdk
+          ANDROID_SDK_ROOT: /usr/local/android-sdk
+          ANDROID_AVD_HOME: $HOME/.android/avd
+
+      - name: Verify emulator is running
+        run: |
+          adb devices
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
