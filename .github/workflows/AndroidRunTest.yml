@@ -38,4 +38,4 @@ jobs:
 
       - name: Run tests
         run: |
-          appium --device "Pixel 6 API 30" --automation-name UiAutomator2 --app src/main/resources/ApiDemos-debug.apk
+          appium --udid "emulator-5554" --automation-name UiAutomator2 --app src/main/resources/ApiDemos-debug.apk
