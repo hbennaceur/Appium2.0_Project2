@@ -46,7 +46,7 @@ public class Base {
         switch (platformName) {
             case "Android":
                 UiAutomator2Options options = new UiAutomator2Options()
-                        .setDeviceName("Nexus 6 API 30")
+                        .setDeviceName("Nexus 6")
                         .setUdid("emulator-5554")
                         .setAutomationName("UiAutomator2")
                         .setApp(appUrl)
