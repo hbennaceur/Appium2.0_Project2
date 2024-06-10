@@ -1,20 +1,35 @@
-name: Afficher le répertoire de travail
+name: Build and Test
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  display_workspace:
+  build:
+
     runs-on: ubuntu-latest
 
+    env:
+      JAVA_HOME: /usr/lib/jvm/adoptopenjdk-17-hotspot-amd64
+
     steps:
-      - name: Checkout du code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Afficher le répertoire de travail
-        run: echo $GITHUB_WORKSPACE
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
 
-      - name: Lister le contenu du répertoire de travail
-        run: ls $GITHUB_WORKSPACE
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Run Tests
+        run: |
+          echo "Running Maven tests..."
+          mvn test -Denv=local
+          echo "Maven tests completed."
+
+    # Ajoutez d'autres étapes de test et de déploiement si nécessaire
