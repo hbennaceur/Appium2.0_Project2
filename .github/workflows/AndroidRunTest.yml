@@ -61,10 +61,11 @@ jobs:
           echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
         timeout-minutes: 10
 
-      - name: List available AVDs
+      - name: List Android SDK contents
         run: |
-          avdmanager list avd
-          dir $HOME\.android\avd
+          ls $ANDROID_SDK_ROOT
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Start Appium server
         run: |
