@@ -65,7 +65,7 @@ jobs:
       - name: List available AVDs
         run: |
           avdmanager list avd
-          ls $HOME/.android/avd
+          ls $HOME/.config/.android/avd
 
       - name: Start Appium server
         run: |
