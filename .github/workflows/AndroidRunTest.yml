@@ -80,9 +80,10 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd emulator-5554 -no-audio -no-window &
-          sleep 60
+          sleep 120
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          PATH: ${{ env.ANDROID_SDK_ROOT }}/emulator:${{ env.ANDROID_SDK_ROOT }}/platform-tools:${{ env.ANDROID_SDK_ROOT }}/tools:${{ env.ANDROID_SDK_ROOT }}/tools/bin:${{ env.PATH }}
 
       - name: Verify emulator is running
         run: |
@@ -97,3 +98,6 @@ jobs:
           echo "Running Maven tests..."
           mvn test -Denv=local
           echo "Maven tests completed."
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
