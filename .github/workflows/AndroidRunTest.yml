@@ -2,7 +2,7 @@ name: Build and Test
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -13,6 +13,9 @@ jobs:
 
     env:
       JAVA_HOME: /usr/lib/jvm/adoptopenjdk-17-hotspot-amd64
+      ANDROID_HOME: /usr/local/android-sdk
+      ANDROID_SDK_ROOT: /usr/local/android-sdk
+      ANDROID_AVD_HOME: $HOME/.android/avd
 
     steps:
       - name: Checkout repository
@@ -23,13 +26,30 @@ jobs:
         with:
           java-version: '17'
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          sdk-platform: 'platforms;android-30'
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager --install 'system-images;android-30;google_apis;x86_64'
+          sdkmanager --install 'platform-tools'
+          sdkmanager --install 'emulator'
+      - name: Accept SDK licenses
+        run: |
+          echo y | sdkmanager --licenses
+
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Run Tests
+      - name: Run Android Tests
         run: |
           echo "Running Maven tests..."
           mvn test -Denv=local
           echo "Maven tests completed."
-
-    # Ajoutez d'autres étapes de test et de déploiement si nécessaire
