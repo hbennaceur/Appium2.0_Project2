@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  test-UI:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
