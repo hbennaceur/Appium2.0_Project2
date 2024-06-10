@@ -15,7 +15,7 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "Setting up environment variables"
-          $env:ANDROID_HOME = "${{ github.workspace }}/android-sdk"
+          $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
           $env:PATH += ";${env:ANDROID_HOME}\emulator"
           $env:PATH += ";${env:ANDROID_HOME}\platform-tools"
           $env:PATH += ";${env:ANDROID_HOME}\tools"
@@ -57,7 +57,7 @@ jobs:
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager --install 'system-images;android-34;google_apis;x86_64'
+          sdkmanager --install 'system-images;android-30;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
       - name: Accept SDK licenses
@@ -70,7 +70,7 @@ jobs:
 
       - name: Create AVD
         run: |
-          echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-34;google_apis;x86_64" --force
+          echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
         timeout-minutes: 10
 
       - name: List available AVDs
@@ -94,7 +94,7 @@ jobs:
 
       - name: Start emulator
         run: |
-          emulator -avd Pixel_6_API_30 -no-audio -no-window &
+          emulator -avd emulator-5554 -no-audio -no-window &
           sleep 60
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
