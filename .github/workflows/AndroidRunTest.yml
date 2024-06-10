@@ -23,9 +23,9 @@ jobs:
           cache: maven
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '16.13.0'
+          node-version: '20'
 
       - name: Install Appium
         run: |
@@ -65,6 +65,9 @@ jobs:
       - name: List available AVDs
         run: |
           avdmanager list avd
+          ls $HOME/.android/avd
+          ls $ANDROID_AVD_HOME
+          ls $ANDROID_SDK_HOME/avd
           ls $HOME/.config/.android/avd
 
       - name: Start Appium server
@@ -88,6 +91,7 @@ jobs:
           sleep 60
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
 
       - name: Verify emulator is running
         run: |
