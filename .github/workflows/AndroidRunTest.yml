@@ -45,7 +45,7 @@ jobs:
           target: ${{ matrix.target }}
           arch: ${{ matrix.arch }}
           profile: Nexus 6
-          emulator-options: '-no-snapshot -noaudio -no-boot-anim'
+          emulator-options: '-no-snapshot -noaudio -no-boot-anim -accel off'
           disable-animations: true
           script: echo "Emulator is ready"
 
