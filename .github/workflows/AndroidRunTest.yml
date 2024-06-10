@@ -80,9 +80,12 @@ jobs:
         run: |
           $ANDROID_SDK_ROOT/emulator/emulator -avd Pixel_6_API_30 -no-audio -no-window &
           sleep 60
+        shell: pwsh
         env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-          ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
+          JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.11-9\x64
+          ANDROID_HOME: C:\Android\android-sdk
+          ANDROID_SDK_ROOT: C:\Android\android-sdk
+          ANDROID_AVD_HOME: ${{ env.HOME }}\.android\avd
 
       - name: Verify emulator is running
         run: |
