@@ -34,15 +34,9 @@ jobs:
         run: appium &> appium.log &
         shell: bash
 
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v2
-
-      - name: Print ANDROID_SDK_ROOT
-        run: echo $ANDROID_SDK_ROOT
-
       - name: Start Emulator
         run: |
-          $ANDROID_SDK_ROOT/emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim &
+          /usr/local/lib/android/sdk/emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim &
         env:
           DISPLAY: ":0"
 
