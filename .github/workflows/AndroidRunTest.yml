@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -31,8 +31,8 @@ jobs:
           appium -v
 
       - name: Start Appium Server
-        run: appium &> appium.log &
-        shell: bash
+        run: |
+          nohup appium &> appium.log &
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
@@ -41,11 +41,11 @@ jobs:
         run: sdkmanager "system-images;android-30;google_apis;x86_64"
 
       - name: Create AVD
-        run: echo "no" | avdmanager create avd -n Pixel 6 API 30 -k "system-images;android-30;google_apis;x86_64" -d "Nexus 6"
+        run: echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" -d "Nexus 6"
 
       - name: Start Emulator
         run: |
-          emulator -avd Pixel 6 API 30 -no-window -no-audio -no-boot-anim &
+          emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim &
         env:
           DISPLAY: ":0"
 
