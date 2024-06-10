@@ -15,7 +15,7 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "Setting up environment variables"
-          $env:ANDROID_HOME = "C:/Android/android-sdk"
+          $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
           $env:ANDROID_SDK_ROOT = $env:ANDROID_HOME
           $env:PATH += ";${env:ANDROID_HOME}\\emulator"
           $env:PATH += ";${env:ANDROID_HOME}\\platform-tools"
@@ -62,9 +62,13 @@ jobs:
           sdkmanager --install 'system-images;android-30;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
+        shell: bash
+
       - name: Accept SDK licenses
         run: |
           echo y | sdkmanager --licenses
+        shell: bash
+
       - name: Run Appium Doctor
         run: |
           appium-doctor --android
@@ -74,28 +78,23 @@ jobs:
         run: |
           echo no | avdmanager create avd -n Nexus_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
         timeout-minutes: 10
+        shell: bash
 
       - name: List available AVDs
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
+        shell: pwsh
 
       - name: Start emulator
         run: |
-          $emulatorProcess = Get-Process emulator -ErrorAction SilentlyContinue
-          if (-not $emulatorProcess) {
-            emulator -avd Nexus_6_API_30 -no-audio -no-window
-            Start-Sleep -Seconds 60
-          } else {
-            Write-Output "Emulator is already running."
-          }
+          Start-Process -NoNewWindow emulator -ArgumentList "-avd Nexus_6_API_30 -no-audio -no-window"
+          Start-Sleep -Seconds 60
         shell: pwsh
         env:
           JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.11-9\x64
-          ANDROID_HOME: C:\Android\android-sdk
-          ANDROID_SDK_ROOT: C:\Android\android-sdk
-
-
+          ANDROID_HOME: C:\Users\runneradmin\Library\Android\sdk
+          ANDROID_SDK_ROOT: C:\Users\runneradmin\Library\Android\sdk
 
       - name: Start Appium server
         run: |
