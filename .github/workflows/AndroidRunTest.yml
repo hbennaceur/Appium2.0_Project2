@@ -21,11 +21,11 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install Appium
-        run: npm install -g appium
-
       - name: Install Genymotion
-        run: wget https://dl.genymotion.com/releases/genymotion-3.2.0/genymotion-3.2.0-linux_x64.bin && chmod +x genymotion-3.2.0-linux_x64.bin && sudo ./genymotion-3.2.0-linux_x64.bin -d /opt/genymobile/genymotion/
+        run: |
+          wget https://dl.genymotion.com/releases/genymotion-3.2.0/genymotion-3.2.0-linux_x64.bin
+          chmod +x genymotion-3.2.0-linux_x64.bin
+          sudo ./genymotion-3.2.0-linux_x64.bin -d /opt/genymobile/genymotion/ --unattended
 
       - name: Start Genymotion emulator
         run: /opt/genymobile/genymotion/genymotion -s --virtual-device="Google Pixel 5 - 11 - API 30" &
@@ -33,6 +33,9 @@ jobs:
       - name: Wait for emulator to start
         run: sleep 30s
 
+      - name: Install Appium
+        run: npm install -g appium
+
       - name: Run tests
         run: |
-          appium --avd "Google Pixel 5 - 11 - API 30" --automation-name UiAutomator2 --app ./src/main/resources/ApiDemos-debug.apk
+          appium --avd "Google Pixel 5 - 11 - API 30" --automation-name UiAutomator2 --app src/main/resources/ApiDemos-debug.apk
