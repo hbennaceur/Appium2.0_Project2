@@ -37,7 +37,7 @@ jobs:
 
       - name: Install UIAutomator2 driver for Appium
         run: |
-          appium driver install uiautomator2@3.0.1
+          appium driver install uiautomator2@latest
         shell: bash
 
       - name: Set up Android SDK
@@ -48,9 +48,13 @@ jobs:
           sdkmanager --install 'system-images;android-30;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
+        shell: bash
+
       - name: Accept SDK licenses
         run: |
-          echo y | sdkmanager --licenses
+          yes | sdkmanager --licenses
+        shell: bash
+
       - name: Run Appium Doctor
         run: |
           appium-doctor --android
@@ -59,13 +63,13 @@ jobs:
       - name: Create AVD
         run: |
           echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
-        timeout-minutes: 10
+        shell: bash
 
-      - name: List Android SDK contents
+      - name: List available AVDs
         run: |
-          ls $ANDROID_SDK_ROOT
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          avdmanager list avd
+          dir $HOME/.android/avd
+        shell: bash
 
       - name: Start Appium server
         run: |
@@ -78,18 +82,26 @@ jobs:
           if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
         shell: pwsh
 
+      - name: List Android SDK contents
+        run: |
+          ls $ANDROID_SDK_ROOT
+        shell: bash
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
       - name: Start emulator
         run: |
-          cd $ANDROID_SDK_ROOT/emulator
-          emulator -avd emulator-5554 -no-audio -no-window 
+          $ANDROID_SDK_ROOT/emulator/emulator -avd Pixel_6_API_30 -no-audio -no-window &
           sleep 60
+        shell: bash
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           PATH: ${{ env.ANDROID_SDK_ROOT }}/emulator:${{ env.ANDROID_SDK_ROOT }}/platform-tools:${{ env.ANDROID_SDK_ROOT }}/tools:${{ env.ANDROID_SDK_ROOT }}/tools/bin:${{ env.PATH }}
 
       - name: Verify emulator is running
         run: |
-          adb devices  
+          adb devices
+        shell: bash
 
       - name: Run Android Tests
         run: |
@@ -100,6 +112,7 @@ jobs:
           echo "Running Maven tests..."
           mvn test -Denv=local
           echo "Maven tests completed."
+        shell: pwsh
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
