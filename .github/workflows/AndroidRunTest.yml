@@ -85,7 +85,8 @@ jobs:
           JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.11-9\x64
           ANDROID_HOME: C:\Android\android-sdk
           ANDROID_SDK_ROOT: C:\Android\android-sdk
-          ANDROID_AVD_HOME: ${{ env.HOME }}\.android\avd
+          ANDROID_AVD_HOME: C:\Users\runneradmin\.android\avd
+
 
       - name: Verify emulator is running
         run: |
