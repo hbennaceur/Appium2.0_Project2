@@ -1,110 +1,145 @@
-name: Java CI with Maven and Android Tests
+name: Functional Tests
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - master
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - chromedriverVersion: "113.0.5672.63"
+            apiLevel: 32
+            emuTag: google_apis
+            arch: x86_64
+          - chromedriverVersion: "83.0.4103.39"
+            apiLevel: 30
+            emuTag: google_apis
+            arch: x86
+          - chromedriverVersion: "2.44"
+            apiLevel: 28
+            emuTag: default
+            arch: x86
+          - chromedriverVersion: "2.20"
+            apiLevel: 23
+            emuTag: default
+            arch: x86
+
+    env:
+      CI: true
+      ANDROID_AVD: emulator
+      APPIUM_TEST_SERVER_PORT: 4567
+      APPIUM_TEST_SERVER_HOST: 127.0.0.1
+      _FORCE_LOGS: 1
+      TEST_PASS_THRESHOLD: 10
 
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - uses: actions/setup-node@v3
         with:
-          java-version: '17'
+          node-version: lts/*
+          check-latest: true
+
+      - run: curl -sSL https://bit.ly/install-xq | sudo bash
+
+      - run: |
+          npm install mocha-multi-reporters --save-dev
+          npm install -g appium
+          npm install --no-save mjpeg-consumer
+        name: Install dev dependencies
+
+      - uses: actions/setup-java@v3
+        with:
           distribution: 'temurin'
-          cache: maven
+          java-version: '17'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install Appium
+      - name: Enable KVM group perms
         run: |
-          npm install -g appium@latest
-          appium -v
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
-      - name: Install Appium Doctor
-        run: |
-          npm install -g appium-doctor
-          appium-doctor --version
-
-      - name: Install UIAutomator2 driver for Appium
-        run: |
-          appium driver install uiautomator2@latest
-
-      - name: Set up Android SDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android SDK packages
-        run: |
-          sdkmanager --install 'system-images;android-30;google_apis;x86_64'
-          sdkmanager --install 'platform-tools'
-          sdkmanager --install 'emulator'
+      - name: AVD cache
+        uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.apiLevel }}
 
-      - name: Accept SDK licenses
-        run: |
-          yes | sdkmanager --licenses
+      - name: create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          avd-name: ${{ env.ANDROID_AVD }}
+          force-avd-creation: false
+          api-level: ${{ matrix.apiLevel }}
+          disable-spellchecker: true
+          target: ${{ matrix.emuTag }}
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          arch: ${{ matrix.arch }}
+          disable-animations: true
+          script: echo "Generated AVD snapshot for caching."
 
-      - name: Run Appium Doctor
-        run: |
-          appium-doctor --android
+      - run: |
+          cwd=$(pwd)
+          pushd "$cwd"
+          cd ~
+          CHROMEDRIVER_VERSION="${{ matrix.chromedriverVersion }}" appium driver install --source=local "$cwd"
+          appium driver doctor uiautomator2
+          nohup appium server \
+            --port=$APPIUM_TEST_SERVER_PORT \
+            --address=$APPIUM_TEST_SERVER_HOST \
+            --relaxed-security \
+            --log-no-colors \
+            --log-timestamp \
+            2>&1 > "$cwd/appium.log" &
+          popd
+        name: Start Appium server
 
-      - name: Create AVD
-        run: |
-          echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
+      - run: nohup adb logcat > logcat.log &
+        name: Capture logcat
 
-      - name: List available AVDs
-        run: |
-          avdmanager list avd
-          ls $HOME/.android/avd
-          ls $ANDROID_AVD_HOME
-          ls $ANDROID_SDK_HOME/avd
-          ls $HOME/.config/.android/avd
+      - uses: reactivecircus/android-emulator-runner@v2
+        name: e2e_api${{ matrix.apiLevel }}
+        with:
+          script: bash -xe scripts/run-functional-tests.sh
+          avd-name: ${{ env.ANDROID_AVD }}
+          force-avd-creation: false
+          api-level: ${{ matrix.apiLevel }}
+          disable-spellchecker: true
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          target: ${{ matrix.emuTag }}
+          arch: ${{ matrix.arch }}
 
-      - name: Start Appium server
-        run: |
-          appium &
-          sleep 20
+      - name: Save logcat output
+        if: ${{ always() }}
+        uses: actions/upload-artifact@master
+        with:
+          name: logcat-api${{ matrix.apiLevel }}
+          path: logcat.log
 
-      - name: Verify Appium server is running
-        run: |
-          curl http://127.0.0.1:4723/status
-          if [ $? -eq 0 ]; then
-            echo "Appium server is running"
-          else
-            echo "Appium server is not running"
-            exit 1
-          fi
-
-      - name: Start emulator
-        run: |
-          $ANDROID_SDK_ROOT/emulator/emulator -avd Pixel_6_API_30 -no-audio -no-window &
-          sleep 60
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-          ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
-
-      - name: Verify emulator is running
-        run: |
-          adb devices
-
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
-      - name: Run Android Tests
-        run: |
-          echo "Running Maven tests..."
-          mvn test -Denv=local
-          echo "Maven tests completed."
-
-      - name: Update dependency graph
-        uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+      - name: Save server output
+        if: ${{ always() }}
+        uses: actions/upload-artifact@master
+        with:
+          name: appium-api${{ matrix.apiLevel }}
+          path: appium.log
