@@ -3,7 +3,7 @@ name: Android UI Tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
       - main
@@ -25,7 +25,7 @@ jobs:
         run: |
           wget https://dl.genymotion.com/releases/genymotion-3.2.0/genymotion-3.2.0-linux_x64.bin
           chmod +x genymotion-3.2.0-linux_x64.bin
-          sudo ./genymotion-3.2.0-linux_x64.bin -d /opt/genymobile/genymotion/ --unattended
+          sudo ./genymotion-3.2.0-linux_x64.bin -d /opt/genymobile/genymotion/ --yes
 
       - name: Start Genymotion emulator
         run: /opt/genymobile/genymotion/genymotion -s --virtual-device="Google Pixel 5 - 11 - API 30" &
