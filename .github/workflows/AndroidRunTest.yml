@@ -78,7 +78,7 @@ jobs:
 
       - name: Start emulator
         run: |
-          emulator -avd Pixel_6_API_30 -no-audio -no-window &
+          emulator -avd Pixel_6_API_30 -no-audio -no-window 
           sleep 60
         shell: pwsh
         env:
