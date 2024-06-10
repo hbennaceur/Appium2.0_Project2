@@ -77,18 +77,7 @@ jobs:
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
-      - name: Start emulator
-        run: |
-          emulator -avd Pixel_5_API_34 -no-audio -no-window &
-          sleep 60
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
-
-
-      - name: Verify emulator is running
-        run: |
-          adb devices
       - name: Start Appium server
         run: |
           appium &
@@ -102,6 +91,19 @@ jobs:
           curl http://127.0.0.1:4723/status
           if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
         shell: pwsh
+
+      - name: Start emulator
+        run: |
+          emulator -avd Pixel_5_API_34 -no-audio -no-window &
+          sleep 60
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
+
+
+      - name: Verify emulator is running
+        run: |
+          adb devices  
 
       - name: Run Android Tests
         run: |
