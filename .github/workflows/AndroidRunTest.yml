@@ -28,7 +28,7 @@ jobs:
           sudo ./genymotion-3.2.0-linux_x64.bin -d /opt/genymobile/genymotion/ --yes
 
       - name: Start Genymotion emulator
-        run: /opt/genymobile/genymotion/genymotion -s --virtual-device="Google Pixel 5 - 11 - API 30" &
+        run: /opt/genymobile/genymotion/genymotion -s --virtual-device="Pixel 6 API 30" &
 
       - name: Wait for emulator to start
         run: sleep 30s
@@ -38,4 +38,4 @@ jobs:
 
       - name: Run tests
         run: |
-          appium --avd "Google Pixel 5 - 11 - API 30" --automation-name UiAutomator2 --app src/main/resources/ApiDemos-debug.apk
+          appium --avd "Pixel 6 API 30" --automation-name UiAutomator2 --app src/main/resources/ApiDemos-debug.apk
