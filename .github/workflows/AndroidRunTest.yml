@@ -3,7 +3,7 @@ name: Android UI Tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
       - main
@@ -11,11 +11,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    services:
-      xvfb:
-        image: circleci/xvfb:latest
-        options: --privileged
 
     env:
       JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
@@ -46,6 +41,14 @@ jobs:
           arch: x86_64
           profile: Pixel_6_API_30
           emulator-options: '-no-window -no-audio -no-snapshot'
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
+      - name: Start xvfb
+        run: |
+          Xvfb :1 -screen 0 1280x1024x24 &
+          export DISPLAY=:1
 
       - name: Start AVD
         run: |
