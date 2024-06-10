@@ -1,4 +1,4 @@
-name: Appium Android
+name: Appium Tests
 
 on:
   push:
@@ -31,21 +31,18 @@ jobs:
           appium -v
 
       - name: Start Appium Server
-        run: |
-          nohup appium &> appium.log &
+        run: appium &> appium.log &
+        shell: bash
 
-      - name: Set up Android SDK
+      - name: Install Android SDK
         uses: android-actions/setup-android@v2
 
-      - name: Install Android Emulator
-        run: sdkmanager "system-images;android-30;google_apis;x86_64"
-
-      - name: Create AVD
-        run: echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" -d "Nexus 6"
+      - name: Print ANDROID_SDK_ROOT
+        run: echo $ANDROID_SDK_ROOT
 
       - name: Start Emulator
         run: |
-          emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim &
+          $ANDROID_SDK_ROOT/emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim &
         env:
           DISPLAY: ":0"
 
