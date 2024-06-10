@@ -79,8 +79,9 @@ jobs:
 
       - name: Start emulator
         run: |
-          emulator -avd emulator-5554 -no-audio -no-window &
-          sleep 120
+          cd $ANDROID_SDK_ROOT/emulator
+          emulator -avd emulator-5554 -no-audio -no-window 
+          sleep 60
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           PATH: ${{ env.ANDROID_SDK_ROOT }}/emulator:${{ env.ANDROID_SDK_ROOT }}/platform-tools:${{ env.ANDROID_SDK_ROOT }}/tools:${{ env.ANDROID_SDK_ROOT }}/tools/bin:${{ env.PATH }}
