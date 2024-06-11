@@ -84,10 +84,7 @@ jobs:
           emulator -avd Pixel_6_API_30 -no-audio -no-window &
           sleep 60
         env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-
-
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
       - name: Verify emulator is running
         run: |
