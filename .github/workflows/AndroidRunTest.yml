@@ -12,7 +12,8 @@ jobs:
     strategy:
       matrix:
         api-level: [30]
-        target: [default]
+        target: [google_apis]
+        profile: [Pixel_6]
     steps:
       - uses: actions/checkout@v2
 
@@ -41,18 +42,18 @@ jobs:
         with:
           api-levels: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          arch: x86_64
-
-      - name: Create AVD
-        run: |
-          echo "y" | sdkmanager --install "system-images;android-${{ matrix.api-level }};default;x86_64"
-          echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};default;x86_64" -d pixel
 
       - name: Start Emulator
-        run: |
-          emulator -avd Pixel_6_API_30 -no-snapshot -no-window &
-          adb wait-for-device
-          adb shell input keyevent 82 &
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          profile: ${{ matrix.profile }}
+          emulator-options: -no-window
+
+      - name: Wait for Emulator
+        run: adb wait-for-device
 
       - name: Start Appium Server
         run: |
