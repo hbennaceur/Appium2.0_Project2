@@ -83,14 +83,13 @@ jobs:
       - name: Start emulator
         run: |
           cd C:\Users\runneradmin\.android\avd
-          emulator -avd Pixel_6_API_30 -no-audio -no-window -port 5554 &
+          emulator -avd Pixel_6_API_30 -no-audio -no-window -port 5556 &
           Start-Sleep -Seconds 60
         shell: pwsh
 
       - name: Verify emulator is running
         run: |
           adb devices
-          adb shell getprop init.svc.bootanim | findstr Stopped
         shell: pwsh
 
       - name: Wait for emulator to boot
@@ -98,7 +97,7 @@ jobs:
           bootanim=""
           while [[ "$bootanim" != *"stopped"* ]]; do
             sleep 5
-            bootanim=$(adb -s emulator-5554 shell getprop init.svc.bootanim 2>&1)
+            bootanim=$(adb -s emulator-5556 shell getprop init.svc.bootanim 2>&1)
             echo "bootanim status: $bootanim"
           done
         shell: bash
