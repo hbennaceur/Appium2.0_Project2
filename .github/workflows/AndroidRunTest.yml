@@ -46,8 +46,7 @@ jobs:
 
       - name: Create AVD
         run: |
-          echo "y" | sdkmanager --install "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64"
-          avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" -d pixel_6
+          echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" -d pixel_6
 
       - name: Start Emulator
         run: |
