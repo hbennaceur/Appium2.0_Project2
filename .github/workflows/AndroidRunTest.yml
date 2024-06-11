@@ -8,14 +8,15 @@ on:
 jobs:
   test:
     runs-on: windows-latest
-    env:
-      ANDROID_HOME: C:/Users/runneradmin/Library/Android/sdk
-      ANDROID_SDK_ROOT: C:/Users/runneradmin/Library/Android/sdk
-      PATH: ${{ env.PATH }};C:/Users/runneradmin/Library/Android/sdk/emulator;C:/Users/runneradmin/Library/Android/sdk/platform-tools;C:/Users/runneradmin/Library/Android/sdk/tools;C:/Users/runneradmin/Library/Android/sdk/tools/bin
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Set up environment variables
+        run: |
+          echo "ANDROID_HOME=C:/Users/runneradmin/Library/Android/sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=C:/Users/runneradmin/Library/Android/sdk" >> $GITHUB_ENV
+          echo "PATH=${{ env.PATH }};C:/Users/runneradmin/Library/Android/sdk/emulator;C:/Users/runneradmin/Library/Android/sdk/platform-tools;C:/Users/runneradmin/Library/Android/sdk/tools;C:/Users/runneradmin/Library/Android/sdk/tools/bin" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
@@ -88,6 +89,7 @@ jobs:
           emulator_port=$(adb devices | grep emulator | cut -f1 | sed 's/emulator-//')
           if [ -z "$emulator_port" ]; then
             echo "Emulator did not start correctly"
+            adb -s emulator-5554 emu kill
             exit 1
           fi
           echo "Emulator is running on port: $emulator_port"
