@@ -10,6 +10,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.11-9/x64
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     strategy:
       matrix:
         api-level: [30]
@@ -51,7 +56,7 @@ jobs:
       - name: Accept Licenses
         run: yes | sdkmanager --licenses
 
-      - name: Install System Images
+      - name: Install System Images and Emulator
         run: |
           sdkmanager --install "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64"
           sdkmanager --install "emulator"
@@ -60,11 +65,17 @@ jobs:
         run: |
           echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" --force
 
+      - name: Restart ADB Server
+        run: |
+          adb kill-server
+          adb start-server
+
       - name: Start Emulator
         run: $ANDROID_HOME/emulator/emulator -avd Pixel_6_API_30 -no-snapshot -no-window -gpu off &
 
       - name: Wait for Emulator to Boot
         run: |
+          sleep 60 # Wait for 60 seconds to ensure emulator boot completion
           adb wait-for-device
           adb shell input keyevent 82
 
