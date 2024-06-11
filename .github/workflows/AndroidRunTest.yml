@@ -84,30 +84,34 @@ jobs:
         run: |
           cd C:\Users\runneradmin\.android\avd
           emulator -avd Pixel_6_API_30 -no-audio -no-window -port 5554 &
-          sleep 60
-          adb kill-server
-          adb start-server
-          adb connect localhost:5554
-          adb wait-for-device
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          Start-Sleep -Seconds 60
+        shell: pwsh
 
       - name: Verify emulator is running
         run: |
           adb devices
+          adb shell getprop init.svc.bootanim | findstr Stopped
+        shell: pwsh
+
+      - name: Wait for emulator to boot
+        run: |
+          bootanim=""
+          while [[ "$bootanim" != *"stopped"* ]]; do
+            sleep 5
+            bootanim=$(adb -s emulator-5554 shell getprop init.svc.bootanim 2>&1)
+            echo "bootanim status: $bootanim"
+          done
+        shell: bash
 
       - name: Start Appium server
         run: |
-          appium &
+          appium --address 127.0.0.1 --port 4723 &
+          sleep 10
         shell: bash
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Verify Appium server is running
         run: |
-          curl http://127.0.0.1:4723/status
+          curl http://127.0.0.1:4723/wd/hub/status
           if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
         shell: pwsh
 
