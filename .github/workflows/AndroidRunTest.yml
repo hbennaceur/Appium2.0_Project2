@@ -14,6 +14,7 @@ jobs:
       matrix:
         api-level: [30]
         target: [google_apis]
+        arch: [arm64-v8a]
 
     steps:
       - name: Checkout code
@@ -45,19 +46,19 @@ jobs:
         with:
           api-levels: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          arch: x86_64
+          arch: ${{ matrix.arch }}
 
       - name: Accept Licenses
         run: yes | sdkmanager --licenses
 
       - name: Install System Images
         run: |
-          sdkmanager --install "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64"
+          sdkmanager --install "system-images;android-${{ matrix.api-level }};${{ matrix.target }};${{ matrix.arch }}"
           sdkmanager --install "emulator"
 
       - name: Create AVD
         run: |
-          echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" --force
+          echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};${{ matrix.arch }}" --force
 
       - name: Start Emulator
         run: |
