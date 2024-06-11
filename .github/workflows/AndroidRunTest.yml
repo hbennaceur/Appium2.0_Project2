@@ -20,8 +20,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
+          distribution: 'temurin'
           java-version: 17
 
       - name: Set up Node.js
@@ -52,6 +53,7 @@ jobs:
       - name: Install System Images
         run: |
           sdkmanager --install "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64"
+          sdkmanager --install "emulator"
 
       - name: Create AVD
         run: |
@@ -59,7 +61,7 @@ jobs:
 
       - name: Start Emulator
         run: |
-          nohup emulator -avd Pixel_6_API_30 -no-snapshot -no-window -gpu off &
+          $ANDROID_HOME/emulator/emulator -avd Pixel_6_API_30 -no-snapshot -no-window -gpu off &
           adb wait-for-device
           adb shell input keyevent 82 &
 
