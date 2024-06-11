@@ -1,82 +1,41 @@
-name: Appium Android
+name: Appium and Selenium Tests
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
-  build:
+  test:
+    name: Appium and Selenium Tests
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        api-level: [30]
-        target: [google_apis]
-        profile: [Pixel_6]
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
-          distribution: 'temurin'
           java-version: 17
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16.13.0'
+          node-version: 16
 
-      - name: Install Appium
-        run: |
-          npm install -g appium@2.5.1
-          appium -v
-
-      - name: Install UiAutomator2 Driver
-        run: |
-          appium driver install uiautomator2@3.0.1
-          appium driver list --installed
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v2
-        with:
-          api-levels: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
-
-      - name: Accept Licenses
-        run: yes | sdkmanager --licenses
-
-      - name: Install System Images
-        run: |
-          sdkmanager --install "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64"
-          sdkmanager --install "emulator"
-
-      - name: Create AVD
-        run: |
-          echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" --force
-
-      - name: Start Emulator
-        run: |
-          nohup $ANDROID_HOME/emulator/emulator -avd Pixel_6_API_30 -no-snapshot -no-window -gpu off &
-
-      - name: Wait for Emulator to Boot
-        run: |
-          sleep 120 # Wait for 2 minutes
-          adb wait-for-device
-          adb shell getprop init.svc.bootanim
-          while [[ $(adb shell getprop init.svc.bootanim) == "running" ]]; do
-            sleep 10
-          done
-          adb shell input keyevent 82
+      - name: Install dependencies
+        run: npm install
 
       - name: Start Appium Server
-        run: |
-          nohup appium &>/dev/null &
+        run: npm run appium:start &
 
-      - name: Run Appium Tests
-        run: mvn clean test -Denv=local
+      - name: Wait for Appium Server to start
+        run: sleep 10
+
+      - name: Run tests with Appium
+        run: npm run test:appium
+
+      - name: Run tests with Selenium
+        run: npm run test:selenium
