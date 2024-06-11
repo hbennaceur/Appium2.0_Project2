@@ -68,8 +68,16 @@ jobs:
         run: |
           sleep 300
           adb wait-for-device
+          adb shell getprop init.svc.bootanim
           adb shell getprop init.svc.bootanim | grep -m 1 'stopped'
           adb shell input keyevent 82
+        shell: /usr/bin/bash -e {0}
+
+      - name: Verify Emulator Boot Status
+        run: |
+          adb shell getprop sys.boot_completed
+          adb shell getprop sys.boot_completed | grep -m 1 '1'
+        shell: /usr/bin/bash -e {0}
 
       - name: Start Appium Server
         run: |
