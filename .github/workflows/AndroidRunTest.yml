@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         api-level: [30]
-        target: [google_apis]
+        target: [default]
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 17
@@ -23,10 +23,17 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-      - run: |
-          npm install -g appium@v2.5.1
-          appium -v
-          appium &
+      - run: npm install -g appium@v2.5.1
+      - name: Configure Emulator
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager --install 'build-tools;30.0.3' 'platform-tools' 'platforms;android-30'
+          sdkmanager --install emulator
+          sdkmanager --install 'system-images;android-30;google_apis;x86_64'
+      - name: Create AVD
+        run: echo no | avdmanager create avd --force -n test --abi 'google_apis/x86_64' --package 'system-images;android-30;google_apis;x86_64' --device 'Pixel_6_API_30'
+      - name: Start Emulator
+        run: emulator -avd Pixel_6_API_30 -no-snapshot -no-window -gpu off &
       - name: Run Appium Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
