@@ -81,10 +81,13 @@ jobs:
       - name: Start emulator
         run: |
           cd C:\Users\runneradmin\.android\avd
-          emulator -avd Pixel_6_API_30 -no-audio -no-window &
+          emulator -avd Pixel_6_API_30 -port 5554 -no-audio -no-window &
+          adb wait-for-device
           sleep 60
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
 
       - name: Verify emulator is running
         run: |
