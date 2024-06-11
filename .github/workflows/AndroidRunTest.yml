@@ -42,7 +42,7 @@ jobs:
 
       - name: Install UIAutomator2 driver for Appium
         run: |
-          appium driver install uiautomator2@3.0.1
+          appium driver install uiautomator2@latest
         shell: bash
 
       - name: Set up Android SDK
@@ -50,7 +50,7 @@ jobs:
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager --install 'system-images;android-34;google_apis;x86_64'
+          sdkmanager --install 'system-images;android-30;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
         shell: bash
@@ -67,7 +67,7 @@ jobs:
 
       - name: Create AVD
         run: |
-          echo no | avdmanager create avd -n Pixel_5_API_34 -k "system-images;android-34;google_apis;x86_64" --force
+          echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
         timeout-minutes: 10
 
       - name: List available AVDs
@@ -78,27 +78,37 @@ jobs:
 
       - name: Start emulator
         run: |
-          emulator -avd Pixel_5_API_34 -no-audio -no-window &
-          sleep 180
+          emulator -avd Pixel_6_API_30 -no-audio -no-window &
+          sleep 80
         shell: bash
 
       - name: Verify emulator is running
         run: |
           adb devices
           emulator_port=$(adb devices | grep emulator | cut -f1 | sed 's/emulator-//')
+          if [ -z "$emulator_port" ]; then
+            echo "Emulator did not start correctly"
+            exit 1
+          fi
           echo "Emulator is running on port: $emulator_port"
         shell: bash
 
       - name: Start Appium server
         run: |
           appium &
+          sleep 10
         shell: bash
 
       - name: Verify Appium server is running
         run: |
-          curl http://127.0.0.1:4723/status
-          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
-        shell: pwsh
+          response=$(curl -s http://127.0.0.1:4723/status)
+          if [[ $response == *"status"* ]]; then
+            echo "Appium server is running"
+          else
+            echo "Appium server is not running"
+            exit 1
+          fi
+        shell: bash
 
       - name: Run Android Tests
         run: |
