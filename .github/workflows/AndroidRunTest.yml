@@ -23,17 +23,30 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-      - run: npm install -g appium@v2.5.1
-      - name: Configure Emulator
+      - name: Print Android SDK Path
+        run: echo $ANDROID_HOME
+      - name: Print SDK Contents
+        run: ls $ANDROID_HOME
+      - name: Accept SDK Licenses
+        run: yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+      - name: Install SDK Components
         run: |
-          yes | sdkmanager --licenses
-          sdkmanager --install 'build-tools;30.0.3' 'platform-tools' 'platforms;android-30'
-          sdkmanager --install emulator
+          sdkmanager --install 'build-tools;30.0.3' 'platform-tools' 'platforms;android-30' 'emulator'
           sdkmanager --install 'system-images;android-30;google_apis;x86_64'
       - name: Create AVD
         run: echo no | avdmanager create avd --force -n test --abi 'google_apis/x86_64' --package 'system-images;android-30;google_apis;x86_64' --device 'Pixel_6_API_30'
-      - name: Start Emulator
-        run: emulator -avd Pixel_6_API_30 -no-snapshot -no-window -gpu off &
+      - name: Launch Emulator
+        run: $ANDROID_HOME/emulator/emulator -avd test -no-snapshot -no-window -gpu off &
+      - name: Wait for Emulator to Boot
+        run: |
+          adb wait-for-device
+          adb shell getprop init.svc.bootanim | grep -m 1 'stopped'
+          adb shell input keyevent 82
+      - name: Install Appium
+        run: |
+          npm install -g appium@v2.5.1
+          appium -v
+          appium &
       - name: Run Appium Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
