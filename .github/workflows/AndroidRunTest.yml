@@ -80,10 +80,11 @@ jobs:
           dir $HOME\.android\avd
       - name: Start emulator
         run: |
-          cd ${{ env.ANDROID_SDK_ROOT }}
+          cd C:\Users\runneradmin\.android\avd
           emulator -avd Pixel_6_API_30 -no-audio -no-window &
           sleep 60
         env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
 
