@@ -46,9 +46,12 @@ jobs:
           target: ${{ matrix.target }}
           arch: x86_64
 
+      - name: Accept Licenses
+        run: yes | sdkmanager --licenses
+
       - name: Create AVD
         run: |
-          echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" -d pixel
+          echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" --force
 
       - name: Start Emulator
         run: |
