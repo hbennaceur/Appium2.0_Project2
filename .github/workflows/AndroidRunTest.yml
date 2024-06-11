@@ -61,10 +61,12 @@ jobs:
           echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" --force
 
       - name: Start Emulator
-        run: $ANDROID_HOME/emulator/emulator -avd Pixel_6_API_30 -no-snapshot -no-window -gpu off &
+        run: |
+          nohup $ANDROID_HOME/emulator/emulator -avd Pixel_6_API_30 -no-snapshot -no-window -gpu off &
 
       - name: Wait for Emulator to Boot
         run: |
+          sleep 120 # Wait for 2 minutes
           adb wait-for-device
           adb shell getprop init.svc.bootanim
           while [[ $(adb shell getprop init.svc.bootanim) == "running" ]]; do
@@ -74,8 +76,7 @@ jobs:
 
       - name: Start Appium Server
         run: |
-          appium &>/dev/null &
-          sleep 10
+          nohup appium &>/dev/null &
 
       - name: Run Appium Tests
         run: mvn clean test -Denv=local
