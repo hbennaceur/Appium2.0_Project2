@@ -1,57 +1,118 @@
-name: Appium Android
+
+name: Run Android tests in GitHub Runner
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ main ]
+    branches: [master]
+  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        api-level: [30]
-        target: [default]
+  test:
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up environment variables
+        run: |
+          echo "Setting up environment variables"
+          $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
+          $env:PATH += ";${env:ANDROID_HOME}\emulator"
+          $env:PATH += ";${env:ANDROID_HOME}\platform-tools"
+          $env:PATH += ";${env:ANDROID_HOME}\tools"
+          $env:PATH += ";${env:ANDROID_HOME}\tools\bin"
+          echo "ANDROID_HOME is set to: $env:ANDROID_HOME"
+          echo "PATH is set to: $env:PATH"
+        shell: pwsh
+
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
+          distribution: 'temurin'
           java-version: 17
-          distribution: 'adopt'
-      - uses: actions/setup-node@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: '16'
-      - name: Print Android SDK Path
-        run: echo $ANDROID_HOME
-      - name: Print SDK Contents
-        run: ls $ANDROID_HOME
-      - name: Accept SDK Licenses
-        run: yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
-      - name: Install SDK Components
-        run: |
-          sdkmanager --install 'build-tools;30.0.3' 'platform-tools' 'platforms;android-30' 'emulator'
-          sdkmanager --install 'system-images;android-30;google_apis;x86_64'
-      - name: Create AVD
-        run: echo no | avdmanager create avd --force -n test --abi 'google_apis/x86_64' --package 'system-images;android-30;google_apis;x86_64' --device 'Pixel_6_API_30'
-      - name: Launch Emulator
-        run: $ANDROID_HOME/emulator/emulator -avd test -no-snapshot -no-window -gpu off &
-      - name: Wait for Emulator to Boot
-        run: |
-          adb wait-for-device
-          adb shell getprop init.svc.bootanim | grep -m 1 'stopped'
-          adb shell input keyevent 82
+          node-version: '16.13.0'
+
       - name: Install Appium
         run: |
-          npm install -g appium@v2.5.1
+          npm install -g appium@2.5.1
           appium -v
+        shell: bash
+
+      - name: Install Appium Doctor
+        run: |
+          npm install -g appium-doctor
+          appium-doctor --version
+        shell: bash
+
+      - name: Install UIAutomator2 driver for Appium
+        run: |
+          appium driver install uiautomator2@3.0.1
+        shell: bash
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager --install 'system-images;android-30;google_apis;x86_64'
+          sdkmanager --install 'platform-tools'
+          sdkmanager --install 'emulator'
+      - name: Accept SDK licenses
+        run: |
+          echo y | sdkmanager --licenses
+      - name: Run Appium Doctor
+        run: |
+          appium-doctor --android
+        shell: bash
+
+      - name: Create AVD
+        run: |
+          echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
+        timeout-minutes: 10
+
+      - name: List available AVDs
+        run: |
+          avdmanager list avd
+          dir $HOME\.android\avd
+      - name: Start emulator
+        run: |
+          emulator -avd Pixel_6_API_30 -no-audio -no-window &
+          sleep 60
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
+
+
+      - name: Verify emulator is running
+        run: |
+          adb devices
+      - name: Start Appium server
+        run: |
           appium &
-      - name: Run Appium Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
-          profile: Pixel_6_API_30
-          script: mvn clean test -Denv=local
+        shell: bash
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
+      - name: Verify Appium server is running
+        run: |
+          curl http://127.0.0.1:4723/status
+          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
+        shell: pwsh
+
+      - name: Run Android Tests
+        run: |
+          echo "JAVA_HOME: $env:JAVA_HOME"
+          echo "ANDROID_HOME: $env:ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT: $env:ANDROID_SDK_ROOT"
+          Get-ChildItem
+          echo "Running Maven tests..."
+          mvn test -Denv=local
+          echo "Maven tests completed."
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
