@@ -37,6 +37,9 @@ jobs:
           appium driver install uiautomator2@3.0.1
           appium driver list --installed
 
+      - name: Update Android SDK
+        run: echo "y" | sdkmanager --update
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
@@ -46,8 +49,7 @@ jobs:
 
       - name: Create AVD
         run: |
-          echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" -d pixel
-
+          echo "no" | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-${{ matrix.api-level }};${{ matrix.target }};x86_64" -d pixel
 
       - name: Start Emulator
         run: |
