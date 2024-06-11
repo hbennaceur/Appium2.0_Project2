@@ -37,9 +37,6 @@ jobs:
           appium driver install uiautomator2@3.0.1
           appium driver list --installed
 
-      - name: Update Android SDK
-        run: echo "y" | sdkmanager --update
-
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
