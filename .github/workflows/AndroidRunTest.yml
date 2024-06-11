@@ -8,6 +8,7 @@ on:
 jobs:
   test:
     runs-on: windows-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -16,7 +17,13 @@ jobs:
         run: |
           echo "ANDROID_HOME=C:/Users/runneradmin/Library/Android/sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=C:/Users/runneradmin/Library/Android/sdk" >> $GITHUB_ENV
-          echo "PATH=$PATH:C:/Users/runneradmin/Library/Android/sdk/emulator:C:/Users/runneradmin/Library/Android/sdk/platform-tools:C:/Users/runneradmin/Library/Android/sdk/tools:C:/Users/runneradmin/Library/Android/sdk/tools/bin" >> $GITHUB_ENV
+          echo "PATH=${{ env.PATH }};C:/Users/runneradmin/Library/Android/sdk/emulator;C:/Users/runneradmin/Library/Android/sdk/platform-tools;C:/Users/runneradmin/Library/Android/sdk/tools;C:/Users/runneradmin/Library/Android/sdk/tools/bin" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Verify PowerShell is available
+        run: |
+          echo "Checking PowerShell version..."
+          pwsh -v || echo "PowerShell not found"
         shell: bash
 
       - name: Set up JDK 17
