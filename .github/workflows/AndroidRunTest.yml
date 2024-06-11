@@ -2,20 +2,22 @@ name: Appium Android
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+
     strategy:
       matrix:
         api-level: [30]
         target: [google_apis]
-        profile: [Pixel_6]
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up JDK 17
         uses: actions/setup-java@v1
@@ -57,7 +59,7 @@ jobs:
       - name: Start Appium Server
         run: |
           appium &>/dev/null &
-          sleep 10  # Wait for Appium to start
+          sleep 10
 
       - name: Run Appium Tests
         run: mvn clean test -Denv=local
