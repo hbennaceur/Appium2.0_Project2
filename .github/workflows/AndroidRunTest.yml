@@ -44,50 +44,55 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           api-level: 30
-          target: default
+          target: google_apis
           ndk: false
+
+      - name: Accept SDK licenses
+        run: yes | sdkmanager --licenses
+        env:
+          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
+        shell: bash
 
       - name: Install Android SDK packages
         run: |
           sdkmanager --install 'system-images;android-30;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
-        shell: bash
-
-      - name: Accept SDK licenses
-        run: |
-          yes | sdkmanager --licenses
+        env:
+          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
         shell: bash
 
       - name: Run Appium Doctor
-        run: |
-          appium-doctor --android
+        run: appium-doctor --android
+        env:
+          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
         shell: bash
 
       - name: Create AVD
-        run: |
-          echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
-        timeout-minutes: 10
+        run: echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
+        env:
+          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
         shell: bash
+        timeout-minutes: 10
 
       - name: List available AVDs
         run: |
           avdmanager list avd
           dir $HOME/.android/avd
+        env:
+          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
         shell: bash
 
       - name: Start emulator
         run: |
-          $env:ANDROID_HOME = ${{ steps.setup-android.outputs.android-home }}
+          $env:ANDROID_HOME = "${{ steps.setup-android.outputs.android-sdk-root }}"
           $env:PATH += ";$env:ANDROID_HOME\emulator;$env:ANDROID_HOME\platform-tools"
-          cd $env:ANDROID_HOME\emulator
           .\emulator.exe -avd Pixel_6_API_30 -no-audio -no-window &
           Start-Sleep -Seconds 60
         shell: pwsh
 
       - name: Verify emulator is running
-        run: |
-          adb devices
+        run: adb devices
         shell: pwsh
 
       - name: Wait for emulator to boot
@@ -101,9 +106,7 @@ jobs:
         shell: pwsh
 
       - name: Start Appium server
-        run: |
-          appium --address 127.0.0.1 --port 4723 &
-          Start-Sleep -Seconds 10
+        run: appium --address 127.0.0.1 --port 4723 &
         shell: pwsh
 
       - name: Verify Appium server is running
@@ -122,6 +125,6 @@ jobs:
           mvn test -Denv=local
           echo "Maven tests completed."
         env:
-          ANDROID_HOME: ${{ steps.setup-android.outputs.android-home }}
-          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-home }}
+          ANDROID_HOME: ${{ steps.setup-android.outputs.android-sdk-root }}
+          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
         shell: pwsh
