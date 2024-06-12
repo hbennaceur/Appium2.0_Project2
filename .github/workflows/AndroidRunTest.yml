@@ -35,7 +35,9 @@ jobs:
 
       - name: Set up emulator
         run: |
-          ./emulator-up.sh
+          chmod +x ./scripts/emulator-up.sh
+          ./scripts/emulator-up.sh
+
 
       - name: Wait for emulator to boot
         run: |
