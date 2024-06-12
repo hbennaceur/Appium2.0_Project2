@@ -60,9 +60,14 @@ jobs:
           sdkmanager --install 'system-images;android-30;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
+
       - name: Accept SDK licenses
         run: |
-          yes | sdkmanager --licenses
+          Get-Content -path "$env:ANDROID_HOME\licenses\android-sdk-license" -Raw |
+            ForEach-Object {$_ -replace "android-sdk-license.*", "android-sdk-license-yes"}
+          & sdkmanager --licenses | ForEach-Object { Write-Output "y" }
+        shell: pwsh
+
       - name: Run Appium Doctor
         run: |
           appium-doctor --android
@@ -81,13 +86,15 @@ jobs:
       - name: Start emulator
         run: |
           emulator -avd Pixel_6_API_30 -no-audio -no-window &
-          sleep 120  # Augmentez le délai d'attente à 120 secondes
+          adb wait-for-device
+          sleep 120  # Assurez-vous que l'émulateur est complètement démarré
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Verify emulator is running
         run: |
           adb devices
+
       - name: Start Appium server
         run: |
           appium &
