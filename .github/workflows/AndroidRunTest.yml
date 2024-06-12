@@ -28,16 +28,13 @@ jobs:
 
       - name: Install Android SDK
         run: |
-          chmod +x emulator-up.sh
-          chmod +x android-sdk-install.sh
-          chmod +x appium-install.sh
-          ./android-sdk-install.sh
+          chmod +x ./scripts/android-sdk-install.sh
+          ./scripts/android-sdk-install.sh
 
       - name: Set up emulator
         run: |
           chmod +x ./scripts/emulator-up.sh
           ./scripts/emulator-up.sh
-
 
       - name: Wait for emulator to boot
         run: |
@@ -49,7 +46,8 @@ jobs:
 
       - name: Run Appium Server
         run: |
-          ./appium-install.sh
+          chmod +x ./scripts/appium-install.sh
+          ./scripts/appium-install.sh
 
       - name: Run tests
         run: |
