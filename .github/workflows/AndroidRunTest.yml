@@ -28,20 +28,28 @@ jobs:
         with:
           sdk-version: '30'
 
-      - name: Initialize ADB
+      # Vérification des processus sur le port 5037
+      - name: Check processes on port 5037
         run: |
-          adb kill-server
-          adb start-server
+          netstat -ano | findstr :5037
 
-      - name: Start Android Emulator
+      # Tuer les processus sur le port 5037 si nécessaire
+      - name: Kill processes on port 5037
         run: |
-          emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
+          taskkill /F /IM adb.exe
 
-      - name: Wait for Emulator to start
-        run: |
-          adb wait-for-device
-          adb shell input keyevent 82  # Simulate unlock screen
+      # Démarrer le serveur ADB
+      - name: Start ADB server
+        run: adb start-server
 
+      # Attendre que le serveur ADB démarre
+      - name: Wait for ADB server to start
+        run: adb wait-for-device
+
+      # Débloquer l'écran de l'émulateur Android
+      - name: Unlock Android Emulator screen
+        run: adb shell input keyevent 82
+
+      # Exécuter les tests Appium
       - name: Run Appium Tests
-        run: |
-          mvn test -Denv=local
+        run: mvn test -Denv=local
