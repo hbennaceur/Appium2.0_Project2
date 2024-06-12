@@ -28,6 +28,11 @@ jobs:
         with:
           sdk-version: '30'
 
+      - name: Initialize ADB
+        run: |
+          adb kill-server
+          adb start-server
+
       - name: Start Android Emulator
         run: |
           emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
@@ -39,5 +44,4 @@ jobs:
 
       - name: Run Appium Tests
         run: |
-          mvn test -Denv=local  
-          
+          mvn test -Denv=local
