@@ -27,19 +27,19 @@ jobs:
         uses: android-actions/setup-android@v2
         with:
           sdk-version: '35'
-        env:
-          ANDROID_HOME: ${{ steps.setup-android.outputs.android-sdk }}
+        id: setup-android
 
       - name: Install ADB
-        run: sdkmanager "platform-tools"
+        run: |
+          echo "y" | ${{ steps.setup-android.outputs.android-sdk }}/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
 
       - name: Install Appium
         run: npm install -g appium@2.5.1
 
       - name: Start Android Emulator
         run: |
-          $env:ANDROID_HOME = "${{ steps.setup-android.outputs.android-sdk }}"
-          $emulatorPath = "$env:ANDROID_HOME\\emulator\\emulator.exe"
+          $env:ANDROID_HOME="${{ steps.setup-android.outputs.android-sdk }}"
+          $emulatorPath="$env:ANDROID_HOME\emulator\emulator.exe"
           if (Test-Path $emulatorPath) {
             Start-Process -FilePath $emulatorPath -ArgumentList "-avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host"
             Start-Sleep -Seconds 30
@@ -48,7 +48,14 @@ jobs:
           }
 
       - name: Check Emulator Status via ADB
-        run: adb devices
+        run: |
+          $env:ANDROID_HOME="${{ steps.setup-android.outputs.android-sdk }}"
+          $adbPath="$env:ANDROID_HOME\platform-tools\adb.exe"
+          if (Test-Path $adbPath) {
+            & $adbPath devices
+          } else {
+            Write-Error "ADB executable not found at $adbPath"
+          }
 
       - name: Start Appium Server
         run: Start-Process -NoNewWindow -FilePath "appium"
