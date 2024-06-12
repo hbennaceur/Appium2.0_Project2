@@ -14,4 +14,4 @@ appium driver install espresso
 appium -v
 
 # Démarrer le serveur Appium en arrière-plan et rediriger les logs vers un fichier
-appium --log appium.log &>/dev/null &
+appium appium &
