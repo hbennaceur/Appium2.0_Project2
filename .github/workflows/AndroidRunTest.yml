@@ -21,34 +21,39 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
       - name: Install Android SDK
         run: |
           sudo apt update
           sudo apt install openjdk-17-jdk -y
-          sudo update-java-alternatives --set java-17-openjdk-amd64
+
+          # Téléchargement et extraction d'Android SDK
           cd ~ && wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
           ANDROID_HOME=/opt/androidsdk
           mkdir -p $ANDROID_HOME
           sudo apt install unzip -y && unzip sdk-tools-linux-4333796.zip -d $ANDROID_HOME
+
+          # Configuration des variables d'environnement pour Java et Android SDK
+          echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> ~/.bashrc
           echo "export ANDROID_HOME=$ANDROID_HOME" >> ~/.bashrc
           echo 'export SDK=$ANDROID_HOME' >> ~/.bashrc
-          echo 'export PATH=$SDK/emulator:$SDK/tools:$SDK/tools/bin:$SDK/platform-tools:$PATH' >> ~/.bashrc
+          echo 'export PATH=$JAVA_HOME/bin:$SDK/emulator:$SDK/tools:$SDK/tools/bin:$SDK/platform-tools:$PATH' >> ~/.bashrc
           source ~/.bashrc
-          yes | sudo sdkmanager "platform-tools" "platforms;android-30" "emulator"
-          yes | sudo sdkmanager "system-images;android-30;google_apis;x86_64"
+
+          # Accepter les licences Android SDK
+          yes | sdkmanager --licenses
+
+          # Installer les packages Android SDK
+          sdkmanager "platform-tools" "platforms;android-30" "emulator" "system-images;android-30;google_apis;x86_64"
+
+          # Vérifier la version de l'émulateur Android installé
           emulator -version
 
       - name: Set up emulator
         run: |
-          # Start emulator in background
+          # Démarrer l'émulateur en arrière-plan
           emulator -avd Pixel_6_API_30 -no-audio -no-window -no-accel &
 
-          # Wait for emulator to be ready
+          # Attendre que l'émulateur soit prêt
           boot_completed=""
           until [ "$boot_completed" = "1" ]; do
             boot_completed=$(adb -e shell getprop sys.boot_completed | tr -d '\r')
