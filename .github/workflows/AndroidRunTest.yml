@@ -31,15 +31,17 @@ jobs:
       - name: Install ADB
         run: sdkmanager "platform-tools"
 
+      - name: Install Appium
+        run: npm install -g appium@2.5.1
+
+
       - name: Start Android Emulator
         run: |
           adb start-server
           emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
 
       - name: Start Appium Server
-        run: appium --log-level=debug &
-
-
+        run: appium &
 
       - name: Run Appium Tests
         run: mvn test -Denv=local
