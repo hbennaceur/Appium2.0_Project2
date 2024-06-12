@@ -28,23 +28,14 @@ jobs:
 
       - name: Install Android SDK
         run: |
-          sudo apt update
-          sudo apt install openjdk-17-jdk -y
-          cd ~ && wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
-          ANDROID_HOME=/opt/androidsdk
-          mkdir -p $ANDROID_HOME
-          sudo apt install unzip -y && unzip sdk-tools-linux-4333796.zip -d $ANDROID_HOME
-          echo "export ANDROID_HOME=$ANDROID_HOME" >> ~/.bashrc
-          echo 'export SDK=$ANDROID_HOME' >> ~/.bashrc
-          echo 'export PATH=$SDK/emulator:$SDK/tools:$SDK/tools/bin:$SDK/platform-tools:$PATH' >> ~/.bashrc
-          source ~/.bashrc
-          yes | sudo sdkmanager "platform-tools" "platforms;android-30" "emulator"
-          yes | sudo sdkmanager "system-images;android-30;google_apis;x86_64"
-          emulator -version
+          chmod +x emulator-up.sh
+          chmod +x android-sdk-install.sh
+          chmod +x appium-install.sh
+          ./android-sdk-install.sh
 
       - name: Set up emulator
         run: |
-          emulator-up.sh
+          ./emulator-up.sh
 
       - name: Wait for emulator to boot
         run: |
@@ -56,7 +47,7 @@ jobs:
 
       - name: Run Appium Server
         run: |
-          RunAppiumServer.sh
+          ./appium-install.sh
 
       - name: Run tests
         run: |
