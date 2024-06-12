@@ -1,4 +1,3 @@
-
 name: Run Android tests in GitHub Runner
 
 on:
@@ -16,7 +15,7 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "Setting up environment variables"
-          $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
+          $env:ANDROID_HOME = "C:/Android/android-sdk"
           $env:PATH += ";${env:ANDROID_HOME}\emulator"
           $env:PATH += ";${env:ANDROID_HOME}\platform-tools"
           $env:PATH += ";${env:ANDROID_HOME}\tools"
@@ -50,7 +49,7 @@ jobs:
 
       - name: Install UIAutomator2 driver for Appium
         run: |
-          appium driver install uiautomator2@3.0.1
+          appium driver install uiautomator2@latest
         shell: bash
 
       - name: Set up Android SDK
@@ -63,7 +62,7 @@ jobs:
           sdkmanager --install 'emulator'
       - name: Accept SDK licenses
         run: |
-          echo y | sdkmanager --licenses
+          yes | sdkmanager --licenses
       - name: Run Appium Doctor
         run: |
           appium-doctor --android
@@ -78,8 +77,17 @@ jobs:
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
-     
 
+      - name: Start emulator
+        run: |
+          emulator -avd Pixel_6_API_30 -no-audio -no-window &
+          sleep 120  # Augmentez le délai d'attente à 120 secondes
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
+      - name: Verify emulator is running
+        run: |
+          adb devices
       - name: Start Appium server
         run: |
           appium &
@@ -87,6 +95,13 @@ jobs:
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
+      - name: Verify Appium server is running
+        run: |
+          curl http://127.0.0.1:4723/status
+          if ($?) { Write-Host "Appium server is running" } else { Write-Host "Appium server is not running"; exit 1 }
+        shell: pwsh
+
       - name: Run Android Tests
         run: |
           echo "JAVA_HOME: $env:JAVA_HOME"
