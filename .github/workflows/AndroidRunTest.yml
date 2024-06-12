@@ -28,11 +28,8 @@ jobs:
         with:
           sdk-version: '30'
 
-      - name: Check for processes using port 5037
-        run: |
-          netstat -ano | findstr :5037 || echo "No process using port 5037"
-          echo "Killing any ADB server running on port 5037"
-          adb kill-server || true
+      - name: Kill any running ADB server
+        run: adb kill-server || true
 
       - name: Start ADB server
         run: adb start-server
@@ -45,13 +42,36 @@ jobs:
       - name: Start Android Emulator
         run: |
           emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
+          sleep 5
 
       - name: Wait for Emulator to start
         run: |
-          sleep 60  # Wait for the emulator to boot up
+          echo "Waiting for emulator to start"
           adb wait-for-device
           adb shell input keyevent 82  # Simulate unlock screen
           adb shell getprop sys.boot_completed | findstr /C:"1"
+
+      - name: Verify Emulator is running
+        run: adb devices
+
+      - name: List open ports (for debugging)
+        run: netstat -ano | findstr LISTENING || echo "No listening ports found"
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Start Appium Server
+        run: appium &
+        env:
+          APPIUM_HOME: C:\Users\runneradmin\AppData\Roaming\npm\node_modules\appium
+
+      - name: Wait for Appium Server to start
+        run: sleep 10
 
       - name: Run Appium Tests
         run: mvn test -Denv=local
