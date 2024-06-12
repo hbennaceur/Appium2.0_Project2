@@ -3,7 +3,7 @@ name: Emulator Debug Workflow
 on:
   push:
     branches:
-      - main  # Changer en branche appropriée si nécessaire
+      - master  # Changer en branche appropriée si nécessaire
   workflow_dispatch:  # Pour déclencher manuellement le workflow si nécessaire
 
 jobs:
