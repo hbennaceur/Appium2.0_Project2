@@ -38,12 +38,10 @@ jobs:
         run: |
           adb start-server
           emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
+          sleep 120
 
       - name: Check Emulator Status via ADB
         run: adb devices
-
-      - name: Check Emulator GUI
-        run: adb shell screencap -p | sed 's/\r$//' > screenshot.png
 
       - name: Start Appium Server
         run: appium &
