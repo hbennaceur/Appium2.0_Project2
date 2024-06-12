@@ -22,8 +22,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
-          java-version: 17
-          distribution: 'adopt'
+          java-version: '17'
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -32,33 +31,21 @@ jobs:
 
       - name: Install Android SDK
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            openjdk-11-jdk-headless \
-            android-sdk \
-            android-sdk-platform-30 \
-            android-sdk-build-tools-30.0.3
+          wget https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip -O android-sdk-tools.zip
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          unzip -q android-sdk-tools.zip -d $HOME/android-sdk/cmdline-tools
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/tools/bin:$ANDROID_HOME/platform-tools
 
-          export ANDROID_HOME=/usr/lib/android-sdk
-          export PATH=$PATH:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+          yes | $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager --licenses
+          $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;google_apis;x86" --verbose
 
       - name: Install Appium
         run: npm install -g appium@2.5.1
 
-      - name: AVD cache
-        uses: actions/cache@v2
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd
-            ~/.android/emu
-            ~/.android/caches
-          key: avd-${{ runner.os }}-${{ matrix.api-level }}-${{ hashFiles('**/gradle-wrapper.properties') }}
-
       - name: Create and start emulator
-        if: steps.avd-cache.outputs.cache-hit != 'true'
         run: |
-          echo no | $ANDROID_HOME/tools/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86"
+          echo no | $ANDROID_HOME/cmdline-tools/tools/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86"
           $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window -gpu swiftshader_indirect &
           $ANDROID_HOME/platform-tools/adb wait-for-device
 
