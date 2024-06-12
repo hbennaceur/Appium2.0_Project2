@@ -1,40 +1,64 @@
-name: Appium CI
+name: Android CI
+
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
-  ui-tests:
-    strategy:
-      matrix:
-        api-level: [30]
-        target: [default]
-    runs-on: macos-latest
+  build:
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 17
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Java 17
         uses: actions/setup-java@v3.6.0
         with:
           distribution: 'temurin'
-          java-version: 17
-          cache: 'maven'
-      - name: Install the Emulator
-        run: |
-          chmod +x ./scripts/RunAppiumServer.sh
-          ./scripts/RunAppiumServer.sh
-        shell: bash
-      - name: Start Appium Server
-        run: |
-          appium &
-        shell: bash
-      - name: Run Appium Tests
-        uses: reactivecircus/android-emulator-runner@v2.27.0
+          java-version: '17'
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: x86_64
-          profile: pixel
-          script: mvn test --info
+          node-version: '16'
+
+      - name: Install Android SDK
+        run: |
+          sudo apt update
+          sudo apt install openjdk-17-jdk -y
+          sudo update-java-alternatives --set java-17-openjdk-amd64
+          cd ~ && wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
+          ANDROID_HOME=/opt/androidsdk
+          mkdir -p $ANDROID_HOME
+          sudo apt install unzip -y && unzip sdk-tools-linux-4333796.zip -d $ANDROID_HOME
+          echo "export ANDROID_HOME=$ANDROID_HOME" >> ~/.bashrc
+          echo 'export SDK=$ANDROID_HOME' >> ~/.bashrc
+          echo 'export PATH=$SDK/emulator:$SDK/tools:$SDK/tools/bin:$SDK/platform-tools:$PATH' >> ~/.bashrc
+          source ~/.bashrc
+          yes | sudo sdkmanager "platform-tools" "platforms;android-30" "emulator"
+          yes | sudo sdkmanager "system-images;android-30;google_apis;x86_64"
+          emulator -version
+
+      - name: Set up emulator
+        run: |
+          emulator-up.sh
+
+      - name: Wait for emulator to boot
+        run: |
+          boot_completed=""
+          until [ "$boot_completed" = "1" ]; do
+            boot_completed=$(adb -e shell getprop sys.boot_completed | tr -d '\r')
+            sleep 1
+          done
+
+      - name: Run Appium Server
+        run: |
+          RunAppiumServer.sh
+
+      - name: Run tests
+        run: |
+          mvn test -Denv=local
