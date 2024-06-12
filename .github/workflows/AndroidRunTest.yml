@@ -26,7 +26,7 @@ jobs:
       - name: Download and set up Android SDK
         uses: android-actions/setup-android@v2
         with:
-          sdk-version: '30'
+          sdk-version: '35'
 
       - name: Install ADB
         run: sdkmanager "platform-tools"
@@ -34,15 +34,8 @@ jobs:
       - name: Start Android Emulator
         run: |
           adb start-server
-          nohup emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
-          adb wait-for-device
-          adb shell input keyevent 82
-        timeout-minutes: 5
-
-      - name: Wait for Android Emulator to boot completely
-        run: |
-          adb wait-for-device
-          sleep 30
+          emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
+  
 
       - name: Run Appium Tests
         run: mvn test -Denv=local
