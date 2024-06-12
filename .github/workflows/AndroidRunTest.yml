@@ -42,16 +42,21 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          api-level: 30
+          target: default
+          ndk: false
 
       - name: Install Android SDK packages
         run: |
           sdkmanager --install 'system-images;android-30;google_apis;x86_64'
           sdkmanager --install 'platform-tools'
           sdkmanager --install 'emulator'
+        shell: bash
 
       - name: Accept SDK licenses
         run: |
-          echo y | sdkmanager --licenses
+          yes | sdkmanager --licenses
         shell: bash
 
       - name: Run Appium Doctor
@@ -68,7 +73,7 @@ jobs:
       - name: List available AVDs
         run: |
           avdmanager list avd
-          dir $HOME\.android\avd
+          dir $HOME/.android/avd
         shell: bash
 
       - name: Start emulator
