@@ -28,18 +28,6 @@ jobs:
         with:
           sdk-version: '30'
 
-      - name: Kill any ADB server running
-        run: |
-          adb kill-server || true
-
-      - name: Start ADB server
-        run: adb start-server
-
-      - name: Wait for ADB server to start
-        run: |
-          sleep 5
-          adb devices
-
       - name: Start Android Emulator
         run: |
           cd $env:ANDROID_HOME\emulator
