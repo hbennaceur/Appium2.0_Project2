@@ -38,14 +38,14 @@ jobs:
 
       - name: Start Android Emulator
         run: |
-          ${ANDROID_HOME}\emulator\emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
-          timeout 90 adb wait-for-device
+          Start-Process -FilePath "${ANDROID_HOME}/emulator/emulator.exe" -ArgumentList "-avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host"
+          Start-Sleep -Seconds 30
 
       - name: Check Emulator Status via ADB
         run: adb devices
 
       - name: Start Appium Server
-        run: appium &
+        run: Start-Process -NoNewWindow -FilePath "appium"
 
       - name: Run Appium Tests
         run: mvn test -Denv=local
