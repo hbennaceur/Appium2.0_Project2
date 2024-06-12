@@ -30,7 +30,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install openjdk-17-jdk -y
-          sudo update-java-alternatives --set java-17-openjdk-amd64
           cd ~ && wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
           ANDROID_HOME=/opt/androidsdk
           mkdir -p $ANDROID_HOME
