@@ -29,22 +29,23 @@ jobs:
           sdk-version: '35'
         env:
           ANDROID_HOME: ${{ steps.setup-android.outputs.android-sdk }}
+
       - name: Install ADB
         run: sdkmanager "platform-tools"
 
       - name: Install Appium
-        run: npm install appium@2.5.1
+        run: npm install -g appium@2.5.1
 
       - name: Start Android Emulator
         run: |
-          ${ANDROID_HOME}\platform-tools\emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host
-          adb wait-for-device
+          ${ANDROID_HOME}\emulator\emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
+          timeout 90 adb wait-for-device
 
       - name: Check Emulator Status via ADB
         run: adb devices
 
       - name: Start Appium Server
-        run: appium
+        run: appium &
 
       - name: Run Appium Tests
         run: mvn test -Denv=local
