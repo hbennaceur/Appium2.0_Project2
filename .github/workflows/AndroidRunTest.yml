@@ -35,7 +35,11 @@ jobs:
         run: |
           adb start-server
           emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
-  
+
+      - name: Start Appium Server
+        run: appium --log-level=debug &
+
+
 
       - name: Run Appium Tests
         run: mvn test -Denv=local
