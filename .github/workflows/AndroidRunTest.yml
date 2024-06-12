@@ -31,7 +31,8 @@ jobs:
 
       - name: Install ADB
         run: |
-          echo "y" | ${{ steps.setup-android.outputs.android-sdk }}/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
+          $androidHome = "${{ steps.setup-android.outputs.android-sdk }}"
+          & "$androidHome\cmdline-tools\latest\bin\sdkmanager.bat" --install "platform-tools"
 
       - name: Install Appium
         run: npm install -g appium@2.5.1
