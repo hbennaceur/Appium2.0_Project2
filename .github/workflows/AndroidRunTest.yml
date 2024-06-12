@@ -24,20 +24,15 @@ jobs:
           node-version: '16.13.0'
 
       - name: Install Appium
-        run: |
-          npm install -g appium@2.5.1
-          appium -v
+        run: npm install -g appium@2.5.1
         shell: bash
 
       - name: Install Appium Doctor
-        run: |
-          npm install -g appium-doctor
-          appium-doctor --version
+        run: npm install -g appium-doctor
         shell: bash
 
       - name: Install UIAutomator2 driver for Appium
-        run: |
-          appium driver install uiautomator2@3.0.1
+        run: appium driver install uiautomator2@3.0.1
         shell: bash
 
       - name: Set up Android SDK
@@ -48,44 +43,42 @@ jobs:
           ndk: false
 
       - name: Accept SDK licenses
-        run: yes | sdkmanager --licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
         env:
-          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
+          ANDROID_HOME: ${{ steps.setup-android.outputs.android-home }}
         shell: bash
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager --install 'system-images;android-30;google_apis;x86_64'
-          sdkmanager --install 'platform-tools'
-          sdkmanager --install 'emulator'
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install 'system-images;android-30;google_apis;x86_64'
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install 'platform-tools'
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install 'emulator'
         env:
-          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
+          ANDROID_HOME: ${{ steps.setup-android.outputs.android-home }}
         shell: bash
 
       - name: Run Appium Doctor
         run: appium-doctor --android
         env:
-          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
+          ANDROID_HOME: ${{ steps.setup-android.outputs.android-home }}
         shell: bash
 
       - name: Create AVD
-        run: echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
+        run: echo no | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
         env:
-          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
+          ANDROID_HOME: ${{ steps.setup-android.outputs.android-home }}
         shell: bash
         timeout-minutes: 10
 
       - name: List available AVDs
-        run: |
-          avdmanager list avd
-          dir $HOME/.android/avd
+        run: $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
         env:
-          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
+          ANDROID_HOME: ${{ steps.setup-android.outputs.android-home }}
         shell: bash
 
       - name: Start emulator
         run: |
-          $env:ANDROID_HOME = "${{ steps.setup-android.outputs.android-sdk-root }}"
+          $env:ANDROID_HOME = "${{ steps.setup-android.outputs.android-home }}"
           $env:PATH += ";$env:ANDROID_HOME\emulator;$env:ANDROID_HOME\platform-tools"
           .\emulator.exe -avd Pixel_6_API_30 -no-audio -no-window &
           Start-Sleep -Seconds 60
@@ -125,6 +118,6 @@ jobs:
           mvn test -Denv=local
           echo "Maven tests completed."
         env:
-          ANDROID_HOME: ${{ steps.setup-android.outputs.android-sdk-root }}
-          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-sdk-root }}
+          ANDROID_HOME: ${{ steps.setup-android.outputs.android-home }}
+          ANDROID_SDK_ROOT: ${{ steps.setup-android.outputs.android-home }}
         shell: pwsh
