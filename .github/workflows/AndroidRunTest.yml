@@ -27,18 +27,24 @@ jobs:
         uses: android-actions/setup-android@v2
         with:
           sdk-version: '35'
+        id: setup-android
         env:
           ANDROID_HOME: ${{ steps.setup-android.outputs.android-sdk }}
+
       - name: Install ADB
         run: sdkmanager "platform-tools"
+        env:
+          ANDROID_HOME: ${{ steps.setup-android.outputs.android-sdk }}
 
       - name: Install Appium
         run: npm install appium@2.5.1
 
       - name: Start Android Emulator
         run: |
-          ${ANDROID_HOME}/platform-tools/emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host
+          $ANDROID_HOME/platform-tools/emulator.exe -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host
           adb wait-for-device
+        env:
+          ANDROID_HOME: ${{ steps.setup-android.outputs.android-sdk }}
 
       - name: Check Emulator Status via ADB
         run: adb devices
