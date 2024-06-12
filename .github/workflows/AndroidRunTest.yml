@@ -38,8 +38,14 @@ jobs:
 
       - name: Start Android Emulator
         run: |
-          Start-Process -FilePath "${ANDROID_HOME}/emulator/emulator.exe" -ArgumentList "-avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host"
-          Start-Sleep -Seconds 30
+          $env:ANDROID_HOME = "${{ steps.setup-android.outputs.android-sdk }}"
+          $emulatorPath = "$env:ANDROID_HOME\\emulator\\emulator.exe"
+          if (Test-Path $emulatorPath) {
+            Start-Process -FilePath $emulatorPath -ArgumentList "-avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host"
+            Start-Sleep -Seconds 30
+          } else {
+            Write-Error "Emulator executable not found at $emulatorPath"
+          }
 
       - name: Check Emulator Status via ADB
         run: adb devices
