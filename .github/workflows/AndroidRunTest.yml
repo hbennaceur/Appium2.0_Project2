@@ -1,4 +1,4 @@
-name: run android tests in github runner
+name: Run Android Tests in GitHub Runner
 
 on: push
 
@@ -7,23 +7,27 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: setup java
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: pull the project in to the runner
+      - name: Pull the project into the runner
         uses: actions/checkout@v3
 
-      - name: setup appium
+      - name: Setup Appium
         run: |
           npm install -g appium@latest
           appium -v
           appium &>/dev/null &
 
-      - name: run appium android tests
+      - name: Start Android Emulator and Run Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
-          script: mvn clean test -Denv=local
+          script: |
+            adb wait-for-device
+            adb devices
+            adb shell input keyevent 82 # Unlock the emulator
+            mvn clean test -Denv=local
