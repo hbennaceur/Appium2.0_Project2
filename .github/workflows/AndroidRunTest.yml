@@ -28,16 +28,21 @@ jobs:
         with:
           sdk-version: '30'
 
+      - name: Install ADB
+        run: sdkmanager "platform-tools"
+
       - name: Start Android Emulator
         run: |
-          cd $env:ANDROID_HOME\emulator
-          .\emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
-      
+          adb start-server
+          nohup emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
+          adb wait-for-device
+          adb shell input keyevent 82
+        timeout-minutes: 5
 
-      - name: Wait for Emulator to start
+      - name: Wait for Android Emulator to boot completely
         run: |
           adb wait-for-device
-          sleep 90
+          sleep 30
 
       - name: Run Appium Tests
         run: mvn test -Denv=local
