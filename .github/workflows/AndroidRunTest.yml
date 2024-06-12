@@ -2,7 +2,7 @@ name: Run Appium Tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -30,6 +30,18 @@ jobs:
         with:
           node-version: '16.13.0'
 
+      - name: Install Android SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            openjdk-11-jdk-headless \
+            android-sdk \
+            android-sdk-platform-30 \
+            android-sdk-build-tools-30.0.3
+
+          export ANDROID_HOME=/usr/lib/android-sdk
+          export PATH=$PATH:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+
       - name: Install Appium
         run: npm install -g appium@2.5.1
 
@@ -46,21 +58,18 @@ jobs:
       - name: Create and start emulator
         if: steps.avd-cache.outputs.cache-hit != 'true'
         run: |
-          echo no | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86"
-          emulator -avd test -no-audio -no-window -gpu swiftshader_indirect &
-          android-wait-for-emulator
+          echo no | $ANDROID_HOME/tools/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86"
+          $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window -gpu swiftshader_indirect &
+          $ANDROID_HOME/platform-tools/adb wait-for-device
 
       - name: Run Tests on Emulator
         run: |
-          # Wait for emulator to be fully booted
-          adb wait-for-device
-
           # Output emulator information
-          adb shell getprop ro.product.model
-          adb shell getprop ro.product.device
+          $ANDROID_HOME/platform-tools/adb shell getprop ro.product.model
+          $ANDROID_HOME/platform-tools/adb shell getprop ro.product.device
           
           # Run your Appium tests
           mvn test -Denv=local
 
       - name: Stop Emulator
-        run: adb emu kill
+        run: $ANDROID_HOME/platform-tools/adb emu kill
