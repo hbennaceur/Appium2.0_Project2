@@ -1,72 +1,43 @@
-name: Android CI
+name: Appium Selenium Tests on Android Emulator
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
   pull_request:
-    branches: [master]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    name: Run Appium Selenium Tests on Android Emulator
+    runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Java 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
-          distribution: 'temurin'
+          distribution: 'adopt'
           java-version: '17'
 
-      - name: Install Android SDK
+      - name: Download and set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          sdk-version: '30'
+
+      - name: Start Android Emulator
         run: |
-          sudo apt update
-          sudo apt install openjdk-17-jdk -y
+          emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
 
-          # Téléchargement et extraction d'Android SDK
-          cd ~ && wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
-          ANDROID_HOME=/opt/androidsdk
-          mkdir -p $ANDROID_HOME
-          sudo apt install unzip -y && unzip sdk-tools-linux-4333796.zip -d $ANDROID_HOME
-
-          # Configuration des variables d'environnement pour Java et Android SDK
-          echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> ~/.bashrc
-          echo "export ANDROID_HOME=$ANDROID_HOME" >> ~/.bashrc
-          echo 'export SDK=$ANDROID_HOME' >> ~/.bashrc
-          echo 'export PATH=$JAVA_HOME/bin:$SDK/emulator:$SDK/tools:$SDK/tools/bin:$SDK/platform-tools:$PATH' >> ~/.bashrc
-          source ~/.bashrc
-
-          # Accepter les licences Android SDK
-          yes | sdkmanager --licenses
-
-          # Installer les packages Android SDK
-          sdkmanager "platform-tools" "platforms;android-30" "emulator" "system-images;android-30;google_apis;x86_64"
-
-          # Vérifier la version de l'émulateur Android installé
-          emulator -version
-
-      - name: Set up emulator
+      - name: Wait for Emulator to start
         run: |
-          # Démarrer l'émulateur en arrière-plan
-          emulator -avd Pixel_6_API_30 -no-audio -no-window -no-accel &
+          adb wait-for-device
+          adb shell input keyevent 82  # Simulate unlock screen
 
-          # Attendre que l'émulateur soit prêt
-          boot_completed=""
-          until [ "$boot_completed" = "1" ]; do
-            boot_completed=$(adb -e shell getprop sys.boot_completed | tr -d '\r')
-            sleep 1
-          done
-
-      - name: Run Appium Server
+      - name: Run Appium Tests
         run: |
-          npm install -g appium@2.5.1
-          appium driver install uiautomator2
-          appium driver install espresso
-          appium --log-level debug &
-
-      - name: Run tests
-        run: |
-          mvn test -Denv=local
+          mvn test -Denv=local  
+          
