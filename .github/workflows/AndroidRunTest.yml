@@ -1,65 +1,29 @@
-name: Appium Selenium Tests on Android Emulator
+name: run android tests in github runner
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - main
+on: push
 
 jobs:
-  test:
-    name: Run Appium Selenium Tests on Android Emulator
-    runs-on: windows-latest
+  run-mobile-tests:
+    runs-on: macos-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
+      - name: setup java
+        uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: '17'
 
-      - name: Download and set up Android SDK
-        uses: android-actions/setup-android@v2
+      - name: pull the project in to the runner
+        uses: actions/checkout@v3
+
+      - name: setup appium
+        run: |
+          npm install -g appium@latest
+          appium -v
+          appium &>/dev/null &
+
+      - name: run appium android tests
+        uses: reactivecircus/android-emulator-runner@v2
         with:
-          sdk-version: '35'
-        id: setup-android
-
-      - name: Install ADB
-        run: |
-          $androidHome = "${{ steps.setup-android.outputs.android-sdk }}"
-          & "$androidHome\cmdline-tools\latest\bin\sdkmanager.bat" --install "platform-tools"
-
-      - name: Install Appium
-        run: npm install -g appium@2.5.1
-
-      - name: Start Android Emulator
-        run: |
-          $env:ANDROID_HOME="${{ steps.setup-android.outputs.android-sdk }}"
-          $emulatorPath="$env:ANDROID_HOME\emulator\emulator.exe"
-          if (Test-Path $emulatorPath) {
-            Start-Process -FilePath $emulatorPath -ArgumentList "-avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host"
-            Start-Sleep -Seconds 30
-          } else {
-            Write-Error "Emulator executable not found at $emulatorPath"
-          }
-
-      - name: Check Emulator Status via ADB
-        run: |
-          $env:ANDROID_HOME="${{ steps.setup-android.outputs.android-sdk }}"
-          $adbPath="$env:ANDROID_HOME\platform-tools\adb.exe"
-          if (Test-Path $adbPath) {
-            & $adbPath devices
-          } else {
-            Write-Error "ADB executable not found at $adbPath"
-          }
-
-      - name: Start Appium Server
-        run: Start-Process -NoNewWindow -FilePath "appium"
-
-      - name: Run Appium Tests
-        run: mvn test -Denv=local
+          api-level: 30
+          script: mvn clean test -Denv=local
