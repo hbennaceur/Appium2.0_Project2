@@ -28,8 +28,10 @@ jobs:
         with:
           sdk-version: '30'
 
-      - name: Kill any ADB server running
+      - name: Check for processes using port 5037
         run: |
+          netstat -ano | findstr :5037 || echo "No process using port 5037"
+          echo "Killing any ADB server running on port 5037"
           adb kill-server || true
 
       - name: Start ADB server
@@ -46,9 +48,10 @@ jobs:
 
       - name: Wait for Emulator to start
         run: |
+          sleep 60  # Wait for the emulator to boot up
           adb wait-for-device
-          sleep 30
           adb shell input keyevent 82  # Simulate unlock screen
+          adb shell getprop sys.boot_completed | findstr /C:"1"
 
       - name: Run Appium Tests
         run: mvn test -Denv=local
