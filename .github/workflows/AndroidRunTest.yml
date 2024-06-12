@@ -1,19 +1,20 @@
-name: Run android tests in github runner
+name: Run Android Tests
 
 on:
   push:
     branches: [ master ]
-
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: macos-latest
+
     strategy:
       matrix:
         api-level: [30]
+
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Set up JDK 17
@@ -21,15 +22,21 @@ jobs:
         with:
           java-version: 17
 
-      - uses: actions/setup-node@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: '16.13.0'
-      - run: |
-          npm install -g appium@v2.5.1
+
+      - name: Update Android SDK
+        run: sdkmanager --update
+
+      - name: Install Appium
+        run: |
+          npm install -g appium@2.5.1
           appium -v
           appium &>/dev/null &
 
-      - name: AVD cache
+      - name: Cache AVD
         uses: actions/cache@v2
         id: avd-cache
         with:
@@ -38,7 +45,7 @@ jobs:
             ~/.android/adb*
           key: avd-${{ matrix.api-level }}
 
-      - name: create AVD and generate snapshot for caching
+      - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -48,7 +55,7 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: run android tests
+      - name: Run Android Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
