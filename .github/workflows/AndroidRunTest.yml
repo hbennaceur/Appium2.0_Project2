@@ -36,7 +36,7 @@ jobs:
 
       - name: Start Android Emulator
         run: |
-          emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host &
+          emulator -avd Pixel_6_API_30 -no-window -no-audio -no-boot-anim -accel auto -gpu host 
           adb wait-for-device
 
       - name: Check Emulator Status via ADB
