@@ -88,6 +88,8 @@ jobs:
 
       - name: Verify emulator is running
         run: |
+          adb kill-server
+          adb start-server
           adb devices
       - name: Start Appium server
         run: |
