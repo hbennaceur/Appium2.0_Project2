@@ -1,19 +1,11 @@
-name: Appium CI
+name: Appium Tests
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
-  ui-tests:
-    strategy:
-      matrix:
-        api-level: [28]
-        target: [default]
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -21,42 +13,46 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
           distribution: 'adopt'
+          java-version: '17'
 
-      - name: Install Node.js and Appium
+      - name: Set up Node.js 16.13.0
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.13.0'
+
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Install Appium Doctor
+        run: npm install -g appium-doctor
+
+      - name: Install UIAutomator2 Driver
+        run: npm install -g appium-uiautomator2-driver
+
+      - name: Run Appium Doctor
+        run: appium-doctor --android
+
+      - name: Download and set up Android SDK
+        uses: malvcr/setup-android-sdk@v1
+        with:
+          api-levels: '30'
+          target: 'android-30'
+          build-tools: '30.0.3'
+
+      - name: Start Android Emulator
         run: |
-          curl -fsSL https://deb.nodesource.com/setup_17.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-          sudo npm install -g appium
+          $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
+          adb wait-for-device
+          adb shell input keyevent 82 &
 
-      - name: Install uiautomator2 driver
-        run: sudo npm install -g appium-uiautomator2-driver
+      - name: Build with Maven
+        run: mvn clean install
 
-      - name: Start Appium Server
-        run: |
-          chmod +x ./scripts/RunAppiumServer.sh
-          ./scripts/RunAppiumServer.sh
-        shell: bash
+      - name: Run Appium server
+        run: appium &
+        env:
+          PATH: /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
 
-      - name: Install Android SDK
-        run: |
-          chmod +x ./scripts/install-android-sdk.sh
-          ./scripts/install-android-sdk.sh
-        shell: bash
-
-      - name: Set up emulator
-        run: |
-          chmod +x ./scripts/emulator-up.sh
-          ./scripts/emulator-up.sh
-        shell: bash
-
-      - name: Run Appium Tests with Maven
+      - name: Run Appium Tests
         run: mvn test
-        working-directory: Appium2.0_Project2  # Adjust this to match your Maven project directory on GitHub
-
-      - name: Appium Cleanup
-        run: |
-          # Any cleanup tasks if needed
-          # For example, stopping Appium server or cleaning up temporary files
-        shell: bash
