@@ -47,6 +47,7 @@ public class Base {
             case "Android":
                 UiAutomator2Options options = new UiAutomator2Options()
                         .setDeviceName("Pixel 6 API 30")
+                        .setPlatformVersion("11.0")
                         .setUdid("emulator-5554")
                         .setAutomationName("UiAutomator2")
                         .setApp(appUrl)

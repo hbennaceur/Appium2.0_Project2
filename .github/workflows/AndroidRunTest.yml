@@ -33,16 +33,28 @@ jobs:
       - name: Run Appium Doctor
         run: appium-doctor --android
 
-      - name: Download and set up Android SDK
-        uses: malvcr/setup-android-sdk@v1
-        with:
-          api-levels: '30'
-          target: 'android-30'
-          build-tools: '30.0.3'
+      - name: Download Android SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget tar unzip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O android-commandline-tools.zip
+          unzip android-commandline-tools.zip -d $HOME/android-sdk
+          mkdir -p $HOME/android-sdk/cmdline-tools/latest
+          mv $HOME/android-sdk/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+          export PATH=$ANDROID_SDK_ROOT/platform-tools:$PATH
+          export PATH=$ANDROID_SDK_ROOT/emulator:$PATH
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-30" "system-images;android-30;google_apis;x86_64" "emulator"
+
+      - name: Create Android Emulator
+        run: |
+          echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
 
       - name: Start Android Emulator
         run: |
-          $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
+          $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-audio -no-window &
           adb wait-for-device
           adb shell input keyevent 82 &
 
