@@ -15,7 +15,7 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "Setting up environment variables"
-          $env:ANDROID_HOME = "C:/Users/runneradmin/Library/Android/sdk"
+          $env:ANDROID_HOME = "C:\Android\android-sdk"
           $env:PATH += ";${env:ANDROID_HOME}\emulator"
           $env:PATH += ";${env:ANDROID_HOME}\platform-tools"
           $env:PATH += ";${env:ANDROID_HOME}\tools"
@@ -81,8 +81,7 @@ jobs:
       - name: Find Android SDK Emulator Path
         id: find-emulator-path
         run: |
-          $env:ANDROID_HOME = "${env:RUNNER_WORKSPACE}\android-sdk"
-          $emulatorPath = Get-ChildItem -Path "$env:ANDROID_HOME\emulator" -Directory | Select-Object -ExpandProperty FullName
+          $emulatorPath = Get-ChildItem -Path "${env:ANDROID_HOME}\emulator" -Directory | Select-Object -ExpandProperty FullName
           Write-Output "Emulator Path: $emulatorPath"
           echo "::set-output name=emulator-path::$emulatorPath"
 
