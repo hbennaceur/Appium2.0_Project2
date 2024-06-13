@@ -53,7 +53,9 @@ jobs:
         shell: bash
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        run: |
+            echo "ANDROID_SDK_ROOT=${{ github.workspace }}/android-sdk" >> $GITHUB_ENV
+            echo "PATH=${{ github.workspace }}/android-sdk/emulator:${{ github.workspace }}/android-sdk/tools:${{ github.workspace }}/android-sdk/platform-tools:${{ github.workspace }}/android-sdk/cmdline-tools/latest/bin:${{ github.workspace }}/android-sdk/cmdline-tools/tools:${{ github.workspace }}/android-sdk/cmdline-tools/platform-tools:${{ github.workspace }}/android-sdk/ndk-bundle:${{ github.workspace }}/android-sdk/ndk-bundle/build/tools" >> $GITHUB_ENV
 
       - name: Install Android SDK packages
         run: |
@@ -78,21 +80,18 @@ jobs:
           avdmanager list avd
           dir $HOME\.android\avd
 
-      - name: Find Android SDK Emulator Path
+      - name: Find Emulator Path
         id: find-emulator-path
         run: |
-          $emulatorPath = Get-ChildItem -Path "${env:ANDROID_HOME}\emulator" -Directory | Select-Object -ExpandProperty FullName
-          Write-Output "Emulator Path: $emulatorPath"
-          echo "::set-output name=emulator-path::$emulatorPath"
+            echo "emulator-path=$(which emulator)" >> $GITHUB_ENV
 
       - name: Start emulator
         run: |
-          cd ${{ steps.find-emulator-path.outputs.emulator-path }}
-          emulator -avd Pixel_6_API_30 -no-audio -no-window &
-          sleep 60
-          adb devices
+            emulator -avd Pixel_6_API_30 -no-audio -no-window &
+            sleep 60
+            adb devices
         env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+            ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
 
       - name: Start Appium server
         run: |
