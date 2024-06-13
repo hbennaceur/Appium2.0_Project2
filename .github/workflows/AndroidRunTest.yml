@@ -38,6 +38,9 @@ jobs:
       - name: Run Appium Doctor
         run: appium-doctor --android
 
+      - name: Start Appium Server
+        run: appium &
+
       - name: Start Android Emulator and run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -47,4 +50,4 @@ jobs:
           script: |
             adb wait-for-device
             adb shell input keyevent 82 &
-            mvn clean test -Denv=local
+            mvn clean test -Denv=local -e
