@@ -47,7 +47,7 @@ jobs:
           Expand-Archive -Path "android-sdk-tools.zip" -DestinationPath "$env:RUNNER_WORKSPACE\android-sdk"
         shell: pwsh
 
-      - name: Set up environment variables
+      - name: Set up environment variables and PATH for Android SDK
         run: |
           $env:ANDROID_HOME = "${{ env.RUNNER_WORKSPACE }}\android-sdk"
           $env:PATH += ";${env:ANDROID_HOME}\cmdline-tools\bin"
@@ -56,36 +56,27 @@ jobs:
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager --install 'platforms;android-30'
-          sdkmanager --install 'system-images;android-30;google_apis;x86_64'
-          sdkmanager --install 'platform-tools'
-          sdkmanager --install 'emulator'
-        shell: bash
-        env:
-          ANDROID_SDK_ROOT: ${{ env.RUNNER_WORKSPACE }}\android-sdk
-
-      - name: Accept SDK licenses
-        run: |
-          yes | sdkmanager --licenses
-        shell: bash
+          sdkmanager --install 'platforms;android-30' 'system-images;android-30;google_apis;x86_64' 'platform-tools' 'emulator'
+          echo y | sdkmanager --licenses
+        shell: pwsh
         env:
           ANDROID_SDK_ROOT: ${{ env.RUNNER_WORKSPACE }}\android-sdk
 
       - name: Verify Android SDK Installation
         run: sdkmanager --list
-        shell: bash
+        shell: pwsh
         env:
           ANDROID_SDK_ROOT: ${{ env.RUNNER_WORKSPACE }}\android-sdk
 
       - name: Run Appium Doctor
         run: |
           appium-doctor --android
-        shell: bash
+        shell: pwsh
 
       - name: Create AVD
         run: |
           echo no | avdmanager create avd -n Pixel_6_API_30 -k "system-images;android-30;google_apis;x86_64" --force
-        shell: bash
+        shell: pwsh
         env:
           ANDROID_SDK_ROOT: ${{ env.RUNNER_WORKSPACE }}\android-sdk
 
@@ -93,7 +84,7 @@ jobs:
         run: |
           avdmanager list avd
           dir $HOME\.android\avd
-        shell: bash
+        shell: pwsh
         env:
           ANDROID_SDK_ROOT: ${{ env.RUNNER_WORKSPACE }}\android-sdk
 
