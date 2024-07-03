@@ -27,18 +27,15 @@ jobs:
         run: |
           npm install -g appium@latest
           appium -v
-        shell: bash
 
       - name: Install Appium Doctor
         run: |
           npm install -g appium-doctor
           appium-doctor --version
-        shell: bash
 
       - name: Install UIAutomator2 driver for Appium
         run: |
           appium driver install uiautomator2@3.0.1
-        shell: bash
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
@@ -51,7 +48,7 @@ jobs:
         with:
           api-level: 30
           target: google_apis
-          profile: pixel_6
+          profile: Pixel_6_API_30
           script: |
             adb wait-for-device
             for i in {1..10}; do
@@ -62,7 +59,6 @@ jobs:
 
       - name: Run Appium Server
         run: appium &
-        shell: bash
 
       - name: Run Android Tests
         run: mvn test -Denv=local
