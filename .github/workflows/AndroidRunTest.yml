@@ -1,10 +1,10 @@
-name: Android Appium Selenium CI
+name: Appium Tests with Maven
 
 on: [push, pull_request]
 
 jobs:
-  build:
-    runs-on: windows-latest
+  test:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -16,58 +16,27 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Chocolatey
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force;
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
-          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+      - name: Download and extract Android SDK
+        uses: actions/setup-android@v2
+        with:
+          sdk-platform: '30'
 
-      - name: Download and set up Android SDK
-        run: |
-          choco install -y android-sdk;
-          echo "sdk.dir=C:\\Android\\android-sdk" > local.properties;
-          echo "ANDROID_HOME=C:\\Android\\android-sdk" >> $env:GITHUB_ENV;
-          echo "PATH=C:\\Android\\android-sdk\\platform-tools;C:\\Android\\android-sdk\\emulator;C:\\Android\\android-sdk\\cmdline-tools\\latest\\bin;$env:PATH" >> $env:GITHUB_ENV;
-          $env:ANDROID_HOME="C:\\Android\\android-sdk";
-          $env:PATH="$env:PATH;C:\\Android\\android-sdk\\platform-tools;C:\\Android\\android-sdk\\emulator;C:\\Android\\android-sdk\\cmdline-tools\\latest\\bin";
-          sdkmanager --update;
-          echo "y" | sdkmanager --licenses;
-          sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;google_apis;x86_64" "emulator"
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.13.0'
 
-      - name: Set up environment variables
-        run: |
-          echo "ANDROID_HOME=C:\\Android\\android-sdk" >> $env:GITHUB_ENV;
-          echo "PATH=C:\\Android\\android-sdk\\platform-tools;C:\\Android\\android-sdk\\emulator;C:\\Android\\android-sdk\\cmdline-tools\\latest\\bin;$env:PATH" >> $env:GITHUB_ENV
+      - name: Install Appium
+        run: npm install -g appium
 
-      - name: Start ADB server
-        run: adb start-server
+      - name: Build and assemble APK
+        run: mvn clean install -DskipTests=true
 
-      - name: Create and start emulator
-        run: |
-          echo no | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force;
-          Start-Process -NoNewWindow -FilePath "$env:ANDROID_HOME\emulator\emulator.exe" -ArgumentList "-avd test -no-snapshot-save -no-audio -no-window -gpu off -accel off"
-          adb wait-for-device
-          adb shell input keyevent 82
+      - name: Start Appium Server
+        run: appium &
 
-      - name: Wait for emulator to boot
-        run: |
-          $bootanim = "";
-          while ($bootanim -ne "stopped") {
-            $bootanim = adb -e shell getprop init.svc.bootanim;
-            Start-Sleep -Seconds 1
-          }
-
-      - name: Install Maven
-        run: choco install -y maven
-
-      - name: Install dependencies
-        run: mvn install
-
-      - name: Run Appium server
-        run: |
-          npm install -g appium;
-          Start-Process -NoNewWindow -FilePath "appium" -ArgumentList "-p 4723"
-          Start-Sleep -Seconds 10
-
-      - name: Run tests
+      - name: Run Appium Tests
         run: mvn test
+
+      - name: Stop Appium Server
+        run: pkill -f appium
