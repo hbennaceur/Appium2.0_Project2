@@ -45,7 +45,7 @@ jobs:
         with:
           api-level: '30'
           target: 'google_apis'
-          profile: 'pixel_6'
+          profile: 'Pixel_6_API_30'
 
       - name: Run Appium Server
         run: appium &
