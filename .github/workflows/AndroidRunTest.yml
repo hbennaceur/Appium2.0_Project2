@@ -24,18 +24,27 @@ jobs:
       - name: Download Android SDK
         run: |
           sudo apt-get update
-          sudo apt-get install -y openjdk-17-jdk wget unzip
+          sudo apt-get install -y wget unzip
           wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip
-          unzip commandlinetools-linux-7583922_latest.zip -d $HOME/android-sdk
-          yes | $HOME/android-sdk/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses
-          $HOME/android-sdk/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;google_apis;x86_64" "emulator"
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          unzip commandlinetools-linux-7583922_latest.zip -d $HOME/android-sdk/cmdline-tools
+          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;google_apis;x86_64" "emulator"
+
+      - name: Set up Android SDK environment variables
+        run: |
+          echo "export ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "export PATH=$PATH:$HOME/android-sdk/platform-tools" >> $GITHUB_ENV
+          echo "export PATH=$PATH:$HOME/android-sdk/emulator" >> $GITHUB_ENV
+          echo "export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_ENV
 
       - name: Start ADB server
         run: adb start-server
 
       - name: Create and start emulator
         run: |
-          echo "no" | $HOME/android-sdk/cmdline-tools/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+          echo "no" | $HOME/android-sdk/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
           $HOME/android-sdk/emulator/emulator -avd test -no-snapshot-save -no-audio -no-window -gpu off &
           adb wait-for-device
           adb shell input keyevent 82
