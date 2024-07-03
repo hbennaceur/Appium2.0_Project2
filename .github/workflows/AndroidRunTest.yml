@@ -40,7 +40,7 @@ jobs:
         run: mvn clean install -DskipTests=true
 
       - name: Start Appium Server
-        run:  start cmd /c "appium"
+        run:  cmd /c start appium
 
       - name: Run Appium Tests
         run: mvn test
