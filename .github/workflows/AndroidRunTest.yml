@@ -1,19 +1,15 @@
-name: Run Appium tests on Android Emulator
+name: Run Android tests in GitHub Runner
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - main
+    branches: [master]
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-
+  test:
+    runs-on: windows-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Set up JDK 17
@@ -21,33 +17,44 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'filesystem'
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: '16.13.0'
 
-      - name: Install dependencies
+      - name: Install Appium
         run: |
-          npm install -g appium appium-doctor
+          npm install -g appium@latest
+          appium -v
+        shell: bash
+
+      - name: Install Appium Doctor
+        run: |
+          npm install -g appium-doctor
           appium-doctor --version
-          npm install
+        shell: bash
 
       - name: Install UIAutomator2 driver for Appium
         run: |
-          appium plugin install --source=npm appium-uiautomator2-driver@3.0.1
+          appium driver install uiautomator2@3.0.1
+        shell: bash
 
-      - name: Start Android Emulator
-        run: |
-          echo no | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64"
-          emulator -avd test -no-audio -no-window &
-          android-wait-for-emulator
+      - name: Start Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: '30'
+          target: 'google_apis'
+          profile: 'Pixel_6_API_30'
 
-      - name: Run Appium tests
-        run: |
-          appium &
-          mvn clean test
+      - name: Run Appium Server
+        run: appium &
+        shell: bash
 
-      - name: Stop emulator
-        run: |
-          adb emu kill
+      - name: Wait for Emulator to start
+        run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+        timeout-minutes: 5
+
+      - name: Run Android Tests
+        run: mvn test -Denv=local
