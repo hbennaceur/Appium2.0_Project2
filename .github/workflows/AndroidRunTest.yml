@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -17,7 +17,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -46,7 +45,7 @@ jobs:
         with:
           api-level: '30'
           target: 'google_apis'
-          profile: 'Pixel_6_API_30'
+          profile: 'pixel_6'
 
       - name: Run Appium Server
         run: appium &
