@@ -1,10 +1,10 @@
-name: Appium Tests with Maven
+name: Appium Tests with Firebase Test Lab
 
 on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -33,10 +33,25 @@ jobs:
         run: mvn clean install -DskipTests=true
 
       - name: Start Appium Server
-        run: appium &
+        run: start /B appium
 
       - name: Run Appium Tests
         run: mvn test
 
       - name: Stop Appium Server
-        run: pkill -f appium
+        run: taskkill /IM node.exe /F
+
+      - name: Upload APK and Test APK to Firebase Test Lab
+        uses: wzieba/Firebase-TestLab-Github-Action@v1
+        with:
+          service_account_key: ${{ secrets.FIREBASE_SA_KEY }}
+          app_apk: 'app/build/outputs/apk/debug/app-debug.apk'
+          test_apk: 'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk'
+          device_ids: 'Pixel_6_API_30'
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: ${{ github.workspace }}/firebase_test_lab_results
