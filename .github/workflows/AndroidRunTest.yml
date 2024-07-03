@@ -20,9 +20,13 @@ jobs:
         run: |
           mkdir -p $HOME/android-sdk
           curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
-          unzip sdk-tools.zip -d $HOME/android-sdk
-          export ANDROID_SDK_ROOT=$HOME/android-sdk
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-30"
+          Expand-Archive -Path sdk-tools.zip -DestinationPath $HOME/android-sdk
+          $env:ANDROID_SDK_ROOT = "$HOME/android-sdk"
+          & $env:ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$env:ANDROID_SDK_ROOT "platforms;android-30"
+        shell: pwsh
+        env:
+          JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.11-9\x64
+
 
       - name: Install Node.js
         uses: actions/setup-node@v2
