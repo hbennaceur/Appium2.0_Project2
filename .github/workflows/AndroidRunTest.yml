@@ -23,15 +23,25 @@ jobs:
           unzip sdk-tools.zip -d $HOME/android-sdk
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           yes | $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-30" "build-tools;30.0.3" "extras;google;m2repository" "extras;android;m2repository"
-      - name: Check Android SDK Root
+      - name: Install Android SDK Tools
         run: |
           echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
-          ls -l $ANDROID_SDK_ROOT
           ls -l $ANDROID_SDK_ROOT/cmdline-tools
-          ls -l $ANDROID_SDK_ROOT/cmdline-tools/bin
+          ls -l $ANDROID_SDK_ROOT/cmdline-tools/tools
+          ls -l $ANDROID_SDK_ROOT/cmdline-tools/tools/bin
+
+          # Installer les outils de la ligne de commande Android nécessaires
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "cmdline-tools;latest"
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-30"
+
+          # Vérifier l'installation
+          ls -l $ANDROID_SDK_ROOT/cmdline-tools
+          ls -l $ANDROID_SDK_ROOT/cmdline-tools/tools
+          ls -l $ANDROID_SDK_ROOT/cmdline-tools/tools/bin
         shell: /usr/bin/bash -e {0}
         env:
-            JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.11-9/x64
+          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.11-9/x64
+
       - name: Install UiAutomator2
         run: |
           $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "extras;google;webdriver"
