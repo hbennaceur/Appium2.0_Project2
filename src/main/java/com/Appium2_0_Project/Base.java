@@ -46,8 +46,7 @@ public class Base {
         switch (platformName) {
             case "Android":
                 UiAutomator2Options options = new UiAutomator2Options()
-                        .setDeviceName("Pixel_6_API_30")
-                        .setPlatformVersion("11.0")
+                        .setDeviceName("Samsung Galaxy S10")    
                        // .setUdid("emulator-5554")
                         .setAutomationName("UiAutomator2")
                         .setApp(appUrl)
