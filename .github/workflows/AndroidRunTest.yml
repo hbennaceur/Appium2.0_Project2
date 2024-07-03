@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -19,19 +19,15 @@ jobs:
       - name: Download and extract Android SDK
         run: |
           mkdir -p $HOME/android-sdk
-          curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-win-7302050_latest.zip
-          Expand-Archive -Path sdk-tools.zip -DestinationPath $HOME/android-sdk
-          $env:ANDROID_SDK_ROOT = "$HOME/android-sdk"
-          & $env:ANDROID_SDK_ROOT\cmdline-tools\bin\sdkmanager --sdk_root=$env:ANDROID_SDK_ROOT "platforms;android-30"
-        shell: pwsh
-        env:
-          JAVA_HOME: C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\17.0.11-9\x64
+          curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
+          unzip sdk-tools.zip -d $HOME/android-sdk
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-30"
 
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18.x'  # Mettez à jour vers une version de Node.js >= 18
-          architecture: x64     # Spécifiez l'architecture si nécessaire
+          node-version: '16.13.0'
 
       - name: Install Appium
         run: npm install -g appium
@@ -40,24 +36,22 @@ jobs:
         run: mvn clean install -DskipTests=true
 
       - name: Start Appium Server
-        run: cmd /c start appium
+        run: appium &
 
       - name: Run Appium Tests
         run: mvn test
 
       - name: Stop Appium Server
-        run: taskkill /IM node.exe /F
+        run: pkill -f appium
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-
-      - name: Authenticate Firebase CLI
-        run: firebase login:ci --token "${{ secrets.FIREBASE_CI_TOKEN }}"
-
-      - name: Upload APKs to Firebase Test Lab
+      - name: Firebase Login and Upload APKs
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_CI_TOKEN }}
         run: |
-          firebase appdistribution:distribute YOUR_APP_PATH --app PACKAGE_NAME
-          firebase appdistribution:tester:apps:add YOUR_TEST_PATH --app PACKAGE_NAME
+          npm install -g firebase-tools
+          firebase login:ci --token "$FIREBASE_TOKEN"
+          firebase appdistribution:distribute 'app/build/outputs/apk/debug/app-debug.apk' --app PACKAGE_NAME
+          firebase appdistribution:tester:apps:add 'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk' --app PACKAGE_NAME
 
       - name: Archive test results
         if: always()
