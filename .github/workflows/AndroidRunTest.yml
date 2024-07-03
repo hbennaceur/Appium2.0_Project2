@@ -45,8 +45,8 @@ jobs:
       - name: Create and start emulator
         run: |
           echo no | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force;
-          start /B "" "%ANDROID_HOME%\\emulator\\emulator.exe -avd test -no-snapshot-save -no-audio -no-window -gpu off";
-          adb wait-for-device;
+          Start-Process -NoNewWindow -FilePath "$env:ANDROID_HOME\emulator\emulator.exe" -ArgumentList "-avd test -no-snapshot-save -no-audio -no-window -gpu off"
+          adb wait-for-device
           adb shell input keyevent 82
 
       - name: Wait for emulator to boot
@@ -66,7 +66,7 @@ jobs:
       - name: Run Appium server
         run: |
           npm install -g appium;
-          start /B appium -p 4723;
+          Start-Process -NoNewWindow -FilePath "appium" -ArgumentList "-p 4723"
           Start-Sleep -Seconds 10
 
       - name: Run tests
