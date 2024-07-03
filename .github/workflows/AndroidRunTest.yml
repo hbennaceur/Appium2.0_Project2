@@ -52,11 +52,13 @@ jobs:
           api-level: 30
           target: google_apis
           profile: pixel_6
-          script: adb devices # Add this line to avoid the "Input required and not supplied: script" error
-
-      - name: Wait for Emulator to start
-        run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-        timeout-minutes: 5
+          script: |
+            adb wait-for-device
+            for i in {1..10}; do
+              adb shell getprop sys.boot_completed | grep -m 1 '1' && echo 'Emulator is ready' && break
+              echo 'Waiting for emulator to start...'
+              sleep 30
+            done
 
       - name: Run Appium Server
         run: appium &
