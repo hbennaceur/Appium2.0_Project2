@@ -45,7 +45,7 @@ jobs:
       - name: Create and start emulator
         run: |
           echo no | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force;
-          Start-Process -NoNewWindow -FilePath "$env:ANDROID_HOME\emulator\emulator.exe" -ArgumentList "-avd test -no-snapshot-save -no-audio -no-window -gpu off"
+          Start-Process -NoNewWindow -FilePath "$env:ANDROID_HOME\emulator\emulator.exe" -ArgumentList "-avd test -no-snapshot-save -no-audio -no-window -gpu off -accel off"
           adb wait-for-device
           adb shell input keyevent 82
 
