@@ -17,9 +17,12 @@ jobs:
           java-version: '17'
 
       - name: Download and extract Android SDK
-        uses: actions/setup-android@v2
-        with:
-          sdk-platform: '30'
+        run: |
+          mkdir -p $HOME/android-sdk
+          curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
+          unzip sdk-tools.zip -d $HOME/android-sdk
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-30"
 
       - name: Install Node.js
         uses: actions/setup-node@v2
@@ -41,13 +44,14 @@ jobs:
       - name: Stop Appium Server
         run: taskkill /IM node.exe /F
 
-      - name: Upload APK and Test APK to Firebase Test Lab
-        uses: wzieba/Firebase-TestLab-Github-Action@v1
-        with:
-          service_account_key: ${{ secrets.FIREBASE_SA_KEY }}
-          app_apk: 'app/build/outputs/apk/debug/app-debug.apk'
-          test_apk: 'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk'
-          device_ids: 'Pixel_6_API_30'
+      # Upload APKs to Firebase manually
+      # Ensure your Firebase CLI is installed and configured
+      # Replace 'YOUR_APP_PATH' and 'YOUR_TEST_PATH' with your actual paths
+      - name: Upload APKs to Firebase Test Lab
+        run: |
+          firebase login:ci --token "${{ secrets.FIREBASE_CI_TOKEN }}"
+          firebase appdistribution:distribute YOUR_APP_PATH --app PACKAGE_NAME
+          firebase appdistribution:tester:apps:add YOUR_TEST_PATH --app PACKAGE_NAME
 
       - name: Archive test results
         if: always()
