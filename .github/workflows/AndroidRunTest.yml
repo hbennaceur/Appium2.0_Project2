@@ -16,14 +16,18 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Install Chocolatey
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; \
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; \
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
       - name: Download and set up Android SDK
         run: |
           choco install -y android-sdk
           echo "sdk.dir=C:\\Android\\android-sdk" > local.properties
           echo "export ANDROID_HOME=C:\\Android\\android-sdk" >> $GITHUB_ENV
-          echo "export PATH=$PATH:C:\\Android\\android-sdk\\platform-tools" >> $GITHUB_ENV
-          echo "export PATH=$PATH:C:\\Android\\android-sdk\\emulator" >> $GITHUB_ENV
-          echo "export PATH=$PATH:C:\\Android\\android-sdk\\cmdline-tools\\latest\\bin" >> $GITHUB_ENV
+          echo "export PATH=$PATH;C:\\Android\\android-sdk\\platform-tools;C:\\Android\\android-sdk\\emulator;C:\\Android\\android-sdk\\cmdline-tools\\latest\\bin" >> $GITHUB_ENV
           $env:ANDROID_HOME="C:\\Android\\android-sdk"
           $env:PATH="$env:PATH;C:\\Android\\android-sdk\\platform-tools;C:\\Android\\android-sdk\\emulator;C:\\Android\\android-sdk\\cmdline-tools\\latest\\bin"
           sdkmanager --update
@@ -31,10 +35,13 @@ jobs:
           sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;google_apis;x86_64" "emulator"
 
       - name: Start ADB server
-        run: adb start-server
+        run: |
+          $env:PATH = "${{ env.PATH }}"
+          adb start-server
 
       - name: Create and start emulator
         run: |
+          $env:PATH = "${{ env.PATH }}"
           echo no | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
           start /B "" "%ANDROID_HOME%\\emulator\\emulator.exe -avd test -no-snapshot-save -no-audio -no-window -gpu off"
           adb wait-for-device
@@ -42,6 +49,7 @@ jobs:
 
       - name: Wait for emulator to boot
         run: |
+          $env:PATH = "${{ env.PATH }}"
           $bootanim = ""
           while ($bootanim -ne "stopped") {
             $bootanim = adb -e shell getprop init.svc.bootanim
