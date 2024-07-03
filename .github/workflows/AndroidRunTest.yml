@@ -40,20 +40,27 @@ jobs:
           appium driver install uiautomator2@3.0.1
         shell: bash
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-levels: 30
+          components: tools, platform-tools
+
       - name: Start Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: '30'
-          target: 'google_apis'
-          profile: 'Pixel_6_API_30'
-
-      - name: Run Appium Server
-        run: appium &
-        shell: bash
+          api-level: 30
+          target: google_apis
+          profile: pixel_6
+          script: adb devices # Add this line to avoid the "Input required and not supplied: script" error
 
       - name: Wait for Emulator to start
         run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
         timeout-minutes: 5
+
+      - name: Run Appium Server
+        run: appium &
+        shell: bash
 
       - name: Run Android Tests
         run: mvn test -Denv=local
