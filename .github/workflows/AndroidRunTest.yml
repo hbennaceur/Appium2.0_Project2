@@ -19,7 +19,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: '11'  # or your desired Java version
+          distribution: 'temurin'
+          java-version: '17'  # or your desired Java version
 
       - name: Install Maven
         run: |
