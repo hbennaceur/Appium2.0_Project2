@@ -22,7 +22,7 @@ jobs:
           curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
           unzip sdk-tools.zip -d $HOME/android-sdk
           export ANDROID_SDK_ROOT=$HOME/android-sdk
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-30"
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-30" "build-tools;30.0.3" "extras;google;m2repository" "extras;android;m2repository"
 
       - name: Install Node.js
         uses: actions/setup-node@v2
@@ -32,8 +32,11 @@ jobs:
       - name: Install Appium
         run: npm install -g appium
 
+      - name: Install UiAutomator2
+        run: $ANDROID_SDK_ROOT/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "extras;google;webdriver"
+
       - name: Build and assemble APK
-        run: mvn clean install -DskipTests=true
+        run: mvn clean install
 
       - name: Start Appium Server
         run: appium &
